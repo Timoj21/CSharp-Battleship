@@ -1,8 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+
 
 namespace BattleshipLib
 {
-    public class Class1
+    public abstract class DAbstract
     {
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

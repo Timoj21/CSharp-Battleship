@@ -27,4 +27,32 @@ namespace BattleshipLib
             };
         }
     }
+
+    public class HostGamePacket : DAbstract
+    {
+        public string name;
+    }
+
+    public class HostGameResponse : DAbstract
+    {
+        public bool inGame;
+    }
+
+    public class JoinGamePacket : DAbstract
+    {
+        public string name;
+    }
+
+    public class JoinGameResponse : DAbstract
+    {
+        public bool inGame;
+    }
+
+    public class ChooseGridPackage : DAbstract
+    {
+        public string name;
+        public int game;
+        public Dictionary<string, bool> grid;
+
+    }
 }

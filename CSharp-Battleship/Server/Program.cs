@@ -1,12 +1,13 @@
 ﻿using System;
 
-namespace Server
+namespace ServerApplication
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Server server = new Server();
+            Console.ReadLine();
         }
     }
 }
