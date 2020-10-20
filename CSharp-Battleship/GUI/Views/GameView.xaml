@@ -48,8 +48,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Button x:Name="A1" Grid.Column="0" Grid.Row="0" Content="A1" Command="{Binding Path=buttonPressedCommand}" CommandParameter="A1"/>
-            <Button x:Name="A2" Grid.Column="1" Grid.Row="0" Content="A2" Command="{Binding Path=buttonPressedCommand}" CommandParameter="A2"/>
+            <Button x:Name="A1" Grid.Column="0" Grid.Row="0" Content="A1" Command="{Binding gridButtonCommand}" CommandParameter="A1"/>
+            <Button x:Name="A2" Grid.Column="1" Grid.Row="0" Content="A2" Command="{Binding Path=gridBbuttonCommand}" CommandParameter="A1"/>
             <Button x:Name="A3" Grid.Column="2" Grid.Row="0" Content="A3" Command="{Binding Path=buttonPressedCommand}" CommandParameter="A3"/>
             <Button x:Name="A4" Grid.Column="3" Grid.Row="0" Content="A4" Command="{Binding Path=buttonPressedCommand}" CommandParameter="A4"/>
             <Button x:Name="A5" Grid.Column="4" Grid.Row="0" Content="A5" Command="{Binding Path=buttonPressedCommand}" CommandParameter="A5"/>
