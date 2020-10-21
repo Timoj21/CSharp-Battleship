@@ -39,15 +39,16 @@ namespace GUI.ViewModels
             this.client.OnBattlelogReceived += Client_OnBattlelogReceived;
             this.client.OnAttackReceived += Client_OnAttackReceived;
 
-            gridButtonCommand = new RelayCommand(() =>
-            {
-                GridButtonCommandHandler(gridButtonCommand);
-            });
 
-            readyUpButtonCommand = new RelayCommand(() =>
-            {
-                ReadyUpButtonCommandHandler();
-            });
+            //gridButtonCommand = new RelayCommand(() =>
+            //{
+            //    GridButtonCommandHandler(gridButtonCommand);
+            //});
+
+            //readyUpButtonCommand = new RelayCommand(() =>
+            //{
+            //    ReadyUpButtonCommandHandler();
+            //});
 
         }
 
