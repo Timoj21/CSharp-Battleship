@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Command;
+using GUI.Models;
 using GUI.Utils;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace GUI.ViewModels
 {
     public class StartViewModel : ObserverableObject
     {
-        private Client client;
+        //private Client client;
         private MainViewModel MainViewModel { get; set; }
         public ICommand joinGameCommand { get; set; }
 
@@ -21,15 +22,18 @@ namespace GUI.ViewModels
 
         public StartViewModel(MainViewModel mainViewModel)
         {
-            this.client = new Client();
-            this.client.OnDataReceived += Client_OnDataReceived;
-            this.client.OnInGameReceived += Client_OnInGameReceived;
+            //MainViewModel.client = new Client();
+            //this.client = new Client();
+            MainViewModel.client.OnDataReceived += Client_OnDataReceived;
+            MainViewModel.client.OnInGameReceived += Client_OnInGameReceived;
             this.MainViewModel = mainViewModel;
             joinGameCommand = new RelayCommand(() =>
             {
                 if (Name != null && Name.Length > 0)
                 {
-                    this.client.SendJoinGame(Name);
+                    MainViewModel.client.SendJoinGame(Name);
+                    //this.client.SendJoinGame(Name);
+                    MainViewModel.player = new Player(Name, false);
                 }
             });
 
@@ -37,7 +41,9 @@ namespace GUI.ViewModels
             {
                 if (Name != null && Name.Length > 0)
                 {
-                    this.client.SendHostGame(Name);
+                    //this.client.SendHostGame(Name);
+                    MainViewModel.client.SendHostGame(Name);
+                    MainViewModel.player = new Player(Name, true);
                 }
             });
         }
@@ -47,7 +53,6 @@ namespace GUI.ViewModels
             if (state)
             {
                 MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel);
-                MainViewModel.players.Add(new Models.Player(Name));
             }
         }
 

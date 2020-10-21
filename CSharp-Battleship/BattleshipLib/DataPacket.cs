@@ -65,4 +65,10 @@ namespace BattleshipLib
     {
         public bool ready;
     }
+
+    public class AttackPacket : DAbstract
+    {
+        public bool isPlayer1;
+        public string cell;
+    }
 }

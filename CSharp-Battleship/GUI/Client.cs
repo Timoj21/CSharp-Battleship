@@ -10,7 +10,8 @@ namespace GUI
     public delegate void DataCallback(string data);
     public delegate void InGameCallback(bool state);
     public delegate void ChooseGridCallback(bool state);
-    class Client
+    public delegate void ReadyUpCallback(bool state);
+    public class Client
     {
         private TcpClient client;
         private NetworkStream stream;
@@ -18,6 +19,7 @@ namespace GUI
 
         public event DataCallback OnDataReceived;
         public event InGameCallback OnInGameReceived;
+        public event ReadyUpCallback OnReadyUpReceived;
 
 
         private bool inGame = false;
@@ -79,7 +81,39 @@ namespace GUI
                         
                         break;
                     }
+                case "READYUPRESPONSE":
+                    {
+                        DataPacket<ReadyUpResponse> d = data.GetData<ReadyUpResponse>();
+                        OnReadyUpReceived?.Invoke(d.data.ready);
+                        break;
+                    }
             }
+        }
+
+        internal void SendAttack(bool isPlayer1, string v)
+        {
+            SendData(new DataPacket<AttackPacket>()
+            {
+                type = "ATTACK",
+                data = new AttackPacket()
+                {
+                    isPlayer1 = isPlayer1,
+                    cell = v
+                }
+            }) ;
+        }
+
+        internal void SendReadyUp(bool isPlayer1, string[] boatPositions)
+        {
+            SendData(new DataPacket<ReadyUpPacket>()
+            {
+                type = "READYUP",
+                data = new ReadyUpPacket()
+                {
+                    isPlayer1 = isPlayer1,
+                    boatPositions = boatPositions
+                }
+            });
         }
 
         public void SendHostGame(string name)
@@ -118,6 +152,30 @@ namespace GUI
                     grid = grid
                 }
             });
+        }
+
+        public void SendData(DataPacket<AttackPacket> data)
+        {
+            // create the sendBuffer based on the message
+            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+            // append the message length (in bytes)
+            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+            // send the message
+            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+        }
+
+        public void SendData(DataPacket<ReadyUpPacket> data)
+        {
+            // create the sendBuffer based on the message
+            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+            // append the message length (in bytes)
+            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+            // send the message
+            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
         }
 
         public void SendData(DataPacket<ChooseGridPackage> data)

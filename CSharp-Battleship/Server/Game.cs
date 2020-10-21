@@ -7,8 +7,8 @@ namespace ServerApplication
     class Game
     {
         public List<ServerClient> players;
-        private Dictionary<string, bool> player1Grid { get; set; }
-        private Dictionary<string, bool> player2Grid { get; set; }
+        public Dictionary<string, bool> player1Grid { get; set; }
+        public Dictionary<string, bool> player2Grid { get; set; }
         private bool isPlayer1 { get; set; }
 
 
@@ -23,5 +23,7 @@ namespace ServerApplication
         {
             this.players.Add(player2);
         }
+
+       
     }
 }

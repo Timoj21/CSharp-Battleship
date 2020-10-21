@@ -91,6 +91,59 @@ namespace ServerApplication
                         });
                         break;
                     }
+                case "READYUP":
+                    {
+                        DataPacket<ReadyUpPacket> d = data.GetData<ReadyUpPacket>();
+                        if (d.data.isPlayer1)
+                        {
+                            Server.games[0].player1Grid.Add(d.data.boatPositions[0], false);
+                            Server.games[0].player1Grid.Add(d.data.boatPositions[1], false);
+                            Server.games[0].player1Grid.Add(d.data.boatPositions[2], false);
+                        } else if (!d.data.isPlayer1)
+                        {
+                            Server.games[0].player2Grid.Add(d.data.boatPositions[0], false);
+                            Server.games[0].player2Grid.Add(d.data.boatPositions[1], false);
+                            Server.games[0].player2Grid.Add(d.data.boatPositions[2], false);
+                        }
+
+                        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player1Grid.Count == 3)
+                        {
+                            SendData(new DataPacket<ReadyUpResponse>()
+                            {
+                                type = "READYUPRESPONSE",
+                                data = new ReadyUpResponse()
+                                {
+                                    ready = true
+                                }
+                            }) ;
+                        } else
+                        {
+                            SendData(new DataPacket<ReadyUpResponse>()
+                            {
+                                type = "READYUPRESPONSE",
+                                data = new ReadyUpResponse()
+                                {
+                                    ready = false
+                                }
+                            });
+                        }
+                        break;
+                    }
+            }
+        }
+
+        private void SendData(DataPacket<ReadyUpResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
             }
         }
 
