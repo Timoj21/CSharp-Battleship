@@ -9,6 +9,7 @@ namespace FileIO
     {
         static void Main(string[] args)
         {
+            ClearFile();
             WriteToFile("jorn");
             ReadFromFile();
 
@@ -40,6 +41,15 @@ namespace FileIO
             StreamReader reader = new StreamReader(@"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt");
             Console.WriteLine(reader.ReadToEnd());
             reader.Close();
+        }
+
+        public static void ClearFile()
+        {
+            string filepath = @"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt";
+            List<string> clearScoreBoard = new List<string>();
+
+            File.WriteAllLines(filepath, clearScoreBoard);
+
         }
     }
 }
