@@ -12,13 +12,15 @@ namespace ServerApplication
         public static List<Game> games;
         public Server()
         {
-            Console.WriteLine("Hello Server!");
+            Console.WriteLine("Server starting...");
 
             games = new List<Game>();
 
             this.listener = new TcpListener(IPAddress.Any, 5252);
             this.listener.Start();
+            Console.WriteLine("Server started");
             this.listener.BeginAcceptTcpClient(new AsyncCallback(OnConnect), null);
+
         }
 
         private void OnConnect(IAsyncResult ar)
