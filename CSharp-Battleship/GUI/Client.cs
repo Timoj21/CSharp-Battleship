@@ -3,18 +3,21 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Security.Policy;
 using System.Text;
 
 namespace GUI
 {
     public delegate void DataCallback(string data);
-    public delegate void InGameCallback(bool state);
+    public delegate void JoinedGameCallback(bool state);
     public delegate void ChooseGridCallback(bool state);
     public delegate void ReadyUpCallback(bool state);
     public delegate void BattlelogCallback(string message);
     public delegate void AttackCallback(bool hit);
 
     public delegate void GameStateChangeCallback(string gameState);
+
+    public delegate void HitMissCallback(string cell, bool hit);
     public class Client
     {
         private TcpClient client;
@@ -22,12 +25,13 @@ namespace GUI
         private byte[] buffer = new byte[4];
 
         public event DataCallback OnDataReceived;
-        public event InGameCallback OnInGameReceived;
         public event ReadyUpCallback OnReadyUpReceived;
         public event BattlelogCallback OnBattlelogReceived;
         public event AttackCallback OnAttackReceived;
 
         public event GameStateChangeCallback OnGameStateChangeReceived;
+        public event JoinedGameCallback OnJoinedGameReceived;
+        public event HitMissCallback OnHitMissReceived;
 
         private bool inGame = false;
 
@@ -72,7 +76,7 @@ namespace GUI
                     {
                         DataPacket<HostGameResponse> d = data.GetData<HostGameResponse>();
                         this.inGame = d.data.inGame;
-                        OnInGameReceived?.Invoke(this.inGame);
+                        OnJoinedGameReceived?.Invoke(this.inGame);
                         break;
                     }
                 case "GAMESTATECHANGE":
@@ -84,8 +88,7 @@ namespace GUI
                 case "JOINGAMERESPONSE":
                     {
                         DataPacket<JoinGameResponse> d = data.GetData<JoinGameResponse>();
-                        this.inGame = d.data.inGame;
-                        OnInGameReceived?.Invoke(this.inGame);
+                        OnJoinedGameReceived?.Invoke(d.data.joinedGame);
                         break;
                     }
                 case "CHOOSEGRIDRESPONSE":
@@ -110,6 +113,12 @@ namespace GUI
                     {
                         DataPacket<AttackResponse> d = data.GetData<AttackResponse>();
                         OnAttackReceived?.Invoke(d.data.hit);
+                        break;
+                    }
+                case "HITMISSRESPONSE":
+                    {
+                        DataPacket<HitMissResponse> d = data.GetData<HitMissResponse>();
+                        OnHitMissReceived?.Invoke(d.data.cell, d.data.hit);
                         break;
                     }
             }

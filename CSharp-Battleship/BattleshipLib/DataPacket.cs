@@ -46,7 +46,7 @@ namespace BattleshipLib
 
     public class JoinGameResponse : DAbstract
     {
-        public bool inGame;
+        public bool joinedGame;
     }
 
     public class GameStateChangePacket : DAbstract
@@ -57,6 +57,12 @@ namespace BattleshipLib
     public class CellPackage : DAbstract
     {
         public bool isPlayer1;
+        public string cell;
+    }
+
+    public class HitMissResponse : DAbstract
+    {
+        public bool hit;
         public string cell;
     }
 

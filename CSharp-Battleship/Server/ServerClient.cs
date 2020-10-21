@@ -49,22 +49,45 @@ namespace ServerApplication
             {
                 case "JOINGAME":
                     {
-                        DataPacket<JoinGamePacket> d = data.GetData<JoinGamePacket>();
-
-                        Console.WriteLine("Player2 joined the game");
-                        Server.game.AddPlayer(this, d.data.name, false);
-
-                        Console.WriteLine("Choose the cells");
-                        Server.game.gameState = GameState.ChooseCells;
-
-                        foreach(Player player in Server.game.players)
+                        if (Server.game != null)
                         {
-                            SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                            DataPacket<JoinGamePacket> d = data.GetData<JoinGamePacket>();
+
+                            Console.WriteLine("Player2 joined the game");
+                            Server.game.AddPlayer(this, d.data.name, false);
+
+                            SendData(new DataPacket<JoinGameResponse>()
                             {
-                                type = "GAMESTATECHANGE",
-                                data = new GameStateChangePacket()
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
                                 {
-                                    state = Server.game.gameState.ToString()
+                                    joinedGame = true
+                                }
+                            });
+
+                            Console.WriteLine("Choose the cells");
+                            Server.game.gameState = GameState.ChooseCells;
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
+                                    {
+                                        state = Server.game.gameState.ToString()
+                                    }
+                                });
+                            }
+                        }
+                        else
+                        {
+                            SendData(new DataPacket<JoinGameResponse>()
+                            {
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
+                                {
+                                    joinedGame = false
                                 }
                             });
                         }
@@ -134,12 +157,13 @@ namespace ServerApplication
                             if (d.data.isPlayer1)
                             {
                                 Console.WriteLine($"Player1 choose {d.data.cell}");
-                                if(Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
+                                if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
                                 {
                                     Console.WriteLine("hij voegt hem bij p2 toe");
                                     Server.game.player1Grid.Add(d.data.cell, false);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 Console.WriteLine($"Player2 choose {d.data.cell}");
                                 if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3)
@@ -149,7 +173,7 @@ namespace ServerApplication
                                 }
                             }
 
-                            if(Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                            if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
                             {
                                 Console.WriteLine("both players choose 3 cells, lets begin");
                                 Server.game.gameState = GameState.Playing;
@@ -166,101 +190,161 @@ namespace ServerApplication
                                     });
                                 }
                             }
+                            break;
+                        }
+                        else if (Server.game.gameState == GameState.Playing)
+                        {
+                            bool hit = false;
+                            if (d.data.isPlayer1)
+                            {
+                                if (Server.game.player2Grid.ContainsKey(d.data.cell))
+                                {
+                                    Console.WriteLine("Player 1 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player2Grid[d.data.cell] = true;
+                                    Server.game.CheckWinner(Server.game.player2Grid);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Player 1 heeft gemist");
+                                }
+                            }
+                            else
+                            {
+                                if (Server.game.player1Grid.ContainsKey(d.data.cell))
+                                {
+                                    Console.WriteLine("Player 2 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player1Grid[d.data.cell] = true;
+                                    Server.game.CheckWinner(Server.game.player1Grid);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Player 2 heeft gemist");
+                                }
+                            }
+
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendData(player.client, new DataPacket<HitMissResponse>()
+                                {
+                                    type = "HITMISSRESPONSE",
+                                    data = new HitMissResponse()
+                                    {
+                                        hit = hit,
+                                        cell = d.data.cell
+                                    }
+                                });
+                            }
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
+                                    {
+                                        state = Server.game.gameState.ToString()
+                                    }
+                                });
+                            }
+                            break;
                         }
                         break;
-                    }
-                //case "READYUP":
-                //    {
-                //        DataPacket<ReadyUpPacket> d = data.GetData<ReadyUpPacket>();
-                //        if (d.data.isPlayer1)
-                //        {
-                //            Server.games[0].player1Grid.Add(d.data.boatPositions[0], false);
-                //            Server.games[0].player1Grid.Add(d.data.boatPositions[1], false);
-                //            Server.games[0].player1Grid.Add(d.data.boatPositions[2], false);
-                //        } else if (!d.data.isPlayer1)
-                //        {
-                //            Server.games[0].player2Grid.Add(d.data.boatPositions[0], false);
-                //            Server.games[0].player2Grid.Add(d.data.boatPositions[1], false);
-                //            Server.games[0].player2Grid.Add(d.data.boatPositions[2], false);
-                //        }
+                        //case "READYUP":
+                        //    {
+                        //        DataPacket<ReadyUpPacket> d = data.GetData<ReadyUpPacket>();
+                        //        if (d.data.isPlayer1)
+                        //        {
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[0], false);
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[1], false);
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[2], false);
+                        //        } else if (!d.data.isPlayer1)
+                        //        {
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[0], false);
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[1], false);
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[2], false);
+                        //        }
 
-                //        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player2Grid.Count == 3)
-                //        {
-                //            foreach (ServerClient client in Server.games[0].players)
-                //            {
-                //                SendData(client, new DataPacket<ReadyUpResponse>()
-                //                {
-                //                    type = "READYUPRESPONSE",
-                //                    data = new ReadyUpResponse()
-                //                    {
-                //                        ready = true
-                //                    }
-                //                });
-                //            }
-                //        } else
-                //        {
-                //            foreach (ServerClient client in Server.games[0].players)
-                //            {
-                //                SendData(client, new DataPacket<ReadyUpResponse>()
-                //                {
-                //                    type = "READYUPRESPONSE",
-                //                    data = new ReadyUpResponse()
-                //                    {
-                //                        ready = false
-                //                    }
-                //                });
-                //            }
-                //        }
-                //        break;
-                //    }
-                //case "BATTLELOGMESSAGE":
-                //    {
-                //        DataPacket<BattlelogPacket> d = data.GetData<BattlelogPacket>();
-                //        foreach (ServerClient client in Server.games[0].players)
-                //        {
-                //            SendData(client, new DataPacket<BattlelogResponse>()
-                //            {
-                //                type = "BATTLELOGRESPONSE",
-                //                data = new BattlelogResponse()
-                //                {
-                //                    message = d.data.message
-                //                }
-                //            });
-                //        }
-                //        break;
-                //    }
-                //case "ATTACK":
-                //    {
-                //        DataPacket<AttackPacket> d = data.GetData<AttackPacket>();
-                //        bool hit = false;
-                //        if (d.data.isPlayer1)
-                //        {
-                //            if (Server.games[0].player2Grid.ContainsKey(d.data.cell))
-                //            {
-                //                hit = true;
-                //                Server.games[0].player2Grid[d.data.cell] = true;
-                //            }
-                //        } else if (!d.data.isPlayer1)
-                //        {
-                //            if (Server.games[0].player1Grid.ContainsKey(d.data.cell))
-                //            {
-                //                hit = true;
-                //                Server.games[0].player1Grid[d.data.cell] = true;
-                //            }
-                //        }
-                //        foreach (ServerClient client in Server.games[0].players)
-                //        {
-                //            SendData(client, new DataPacket<AttackResponse>()
-                //            {
-                //                type = "ATTACKRESPONSE",
-                //                data = new AttackResponse()
-                //                {
-                //                    hit = hit
-                //                }
-                //            });
-                //        }
-                //        break;
-                //    }
+                        //        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player2Grid.Count == 3)
+                        //        {
+                        //            foreach (ServerClient client in Server.games[0].players)
+                        //            {
+                        //                SendData(client, new DataPacket<ReadyUpResponse>()
+                        //                {
+                        //                    type = "READYUPRESPONSE",
+                        //                    data = new ReadyUpResponse()
+                        //                    {
+                        //                        ready = true
+                        //                    }
+                        //                });
+                        //            }
+                        //        } else
+                        //        {
+                        //            foreach (ServerClient client in Server.games[0].players)
+                        //            {
+                        //                SendData(client, new DataPacket<ReadyUpResponse>()
+                        //                {
+                        //                    type = "READYUPRESPONSE",
+                        //                    data = new ReadyUpResponse()
+                        //                    {
+                        //                        ready = false
+                        //                    }
+                        //                });
+                        //            }
+                        //        }
+                        //        break;
+                        //    }
+                        //case "BATTLELOGMESSAGE":
+                        //    {
+                        //        DataPacket<BattlelogPacket> d = data.GetData<BattlelogPacket>();
+                        //        foreach (ServerClient client in Server.games[0].players)
+                        //        {
+                        //            SendData(client, new DataPacket<BattlelogResponse>()
+                        //            {
+                        //                type = "BATTLELOGRESPONSE",
+                        //                data = new BattlelogResponse()
+                        //                {
+                        //                    message = d.data.message
+                        //                }
+                        //            });
+                        //        }
+                        //        break;
+                        //    }
+                        //case "ATTACK":
+                        //    {
+                        //        DataPacket<AttackPacket> d = data.GetData<AttackPacket>();
+                        //        bool hit = false;
+                        //        if (d.data.isPlayer1)
+                        //        {
+                        //            if (Server.games[0].player2Grid.ContainsKey(d.data.cell))
+                        //            {
+                        //                hit = true;
+                        //                Server.games[0].player2Grid[d.data.cell] = true;
+                        //            }
+                        //        } else if (!d.data.isPlayer1)
+                        //        {
+                        //            if (Server.games[0].player1Grid.ContainsKey(d.data.cell))
+                        //            {
+                        //                hit = true;
+                        //                Server.games[0].player1Grid[d.data.cell] = true;
+                        //            }
+                        //        }
+                        //        foreach (ServerClient client in Server.games[0].players)
+                        //        {
+                        //            SendData(client, new DataPacket<AttackResponse>()
+                        //            {
+                        //                type = "ATTACKRESPONSE",
+                        //                data = new AttackResponse()
+                        //                {
+                        //                    hit = hit
+                        //                }
+                        //            });
+                        //        }
+                        //        break;
+                        //    }
+                    }
             }
         }
 
@@ -279,7 +363,22 @@ namespace ServerApplication
             }
         }
 
-        private void SendData(ServerClient client, DataPacket<AttackResponse> data)
+            private void SendData(ServerClient client, DataPacket<HitMissResponse> data)
+            {
+                if (this.isConnected)
+                {
+                    // create the sendBuffer based on the message
+                    List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                    // append the message length (in bytes)
+                    sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                    // send the message
+                    this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+                }
+            }
+
+            private void SendData(ServerClient client, DataPacket<AttackResponse> data)
         {
             if (this.isConnected)
             {

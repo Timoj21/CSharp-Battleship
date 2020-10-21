@@ -32,6 +32,22 @@ namespace ServerApplication
             this.players.Add(new Player(client, name, isPlayer1));
         }
 
+        public void CheckWinner(Dictionary<string, bool> grid)
+        {
+            int amount = 0;
+            foreach(KeyValuePair<string, bool> cell in grid)
+            {
+                if (cell.Value)
+                {
+                    amount++;
+                }
+            }
+            if(amount == 3)
+            {
+                this.gameState = GameState.Ended;
+            }
+        }
+
        
     }
 }

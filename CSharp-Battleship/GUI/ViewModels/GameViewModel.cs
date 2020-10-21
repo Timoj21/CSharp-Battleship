@@ -33,6 +33,7 @@ namespace GUI.ViewModels
             battlelogTextBlock = "Welcome to Battleship\n";
 
             this.client.OnGameStateChangeReceived += Client_OnGameStateChangeReceived;
+            this.client.OnHitMissReceived += Client_OnHitMissReceived;
 
             this.client.OnReadyUpReceived += Client_OnReadyUpReceived;
             this.client.OnBattlelogReceived += Client_OnBattlelogReceived;
@@ -48,6 +49,17 @@ namespace GUI.ViewModels
                 ReadyUpButtonCommandHandler();
             });
 
+        }
+
+        private void Client_OnHitMissReceived(string cell, bool hit)
+        {
+            if (hit)
+            {
+                battlelogTextBlock += "HIT\n";
+            } else
+            {
+                battlelogTextBlock += "MISS\n";
+            }
         }
 
         private void Client_OnGameStateChangeReceived(string gameState)
@@ -66,7 +78,13 @@ namespace GUI.ViewModels
                     }
                 case "Playing":
                     {
-                        battlelogTextBlock += "Lets begin\n";
+                        if (MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock += "Its player 1 his turn\n";
+                        } else if (!MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock += "Its player 2 his turn\n";
+                        }
                         break;
                     }
                 case "Ended":
