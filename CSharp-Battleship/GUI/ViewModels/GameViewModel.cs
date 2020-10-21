@@ -20,9 +20,14 @@ namespace GUI.ViewModels
 
         public ICommand readyUpButtonCommand { get; set; }
 
+        private int tempTimerP1 { get; set; }
+        private int tempTimerp2 { get; set; }
+
 
         public GameViewModel(MainViewModel mainViewModel, Client client)
         {
+            this.tempTimerP1 = 1;
+            this.tempTimerp2 = 1;
             this.MainViewModel = mainViewModel;
             this.client = client;
             battlelogTextBlock = "Welcome to Battleship\n";
@@ -56,12 +61,12 @@ namespace GUI.ViewModels
                     }
                 case "ChooseCells":
                     {
-                        battlelogTextBlock += "Choose 3 cells and click on ready";
+                        battlelogTextBlock += "Choose 3 cells and click on ready\n";
                         break;
                     }
                 case "Playing":
                     {
-
+                        battlelogTextBlock += "Lets begin\n";
                         break;
                     }
                 case "Ended":
@@ -109,24 +114,33 @@ namespace GUI.ViewModels
         {
             if (MainViewModel.player.boatPositions[2] != null)
             {
-                this.client.SendReadyUp(MainViewModel.player.isPlayer1, MainViewModel.player.boatPositions);
+                //this.client.SendReadyUp(MainViewModel.player.isPlayer1, MainViewModel.player.boatPositions);
             }
         }
 
         private void GridButtonCommandHandler(object parameter)
         {
-            //TODO dit nog aanpassen wanneer de buttons goed werken
-            if(MainViewModel.player.boatPositions[2] == null)
+            if (MainViewModel.player.isPlayer1)
             {
-                MainViewModel.player.boatPositions[0] = "A1";
-                MainViewModel.player.boatPositions[1] = "A2";
-                MainViewModel.player.boatPositions[2] = "A3";
+                this.client.SendCell(MainViewModel.player.isPlayer1, "A" + tempTimerP1.ToString());
+                this.tempTimerP1 += 1;
+            } else
+            {
+                this.client.SendCell(MainViewModel.player.isPlayer1, "A" + tempTimerp2.ToString());
+                this.tempTimerp2 += 1;
             }
 
-            if (MainViewModel.player.Turn)
-            {
-                this.client.SendAttack(MainViewModel.player.isPlayer1, "A1");
-            }
+            //if(MainViewModel.player.boatPositions[2] == null)
+            //{
+            //    MainViewModel.player.boatPositions[0] = "A1";
+            //    MainViewModel.player.boatPositions[1] = "A2";
+            //    MainViewModel.player.boatPositions[2] = "A3";
+            //}
+
+            //if (MainViewModel.player.Turn)
+            //{
+            //    this.client.SendAttack(MainViewModel.player.isPlayer1, "A1");
+            //}
         }
     }
 }

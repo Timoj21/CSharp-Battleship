@@ -125,6 +125,50 @@ namespace ServerApplication
                         //});
                         break;
                     }
+                case "CELL":
+                    {
+                        DataPacket<CellPackage> d = data.GetData<CellPackage>();
+
+                        if (Server.game.gameState == GameState.ChooseCells)
+                        {
+                            if (d.data.isPlayer1)
+                            {
+                                Console.WriteLine($"Player1 choose {d.data.cell}");
+                                if(Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
+                                {
+                                    Console.WriteLine("hij voegt hem bij p2 toe");
+                                    Server.game.player1Grid.Add(d.data.cell, false);
+                                }
+                            } else
+                            {
+                                Console.WriteLine($"Player2 choose {d.data.cell}");
+                                if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3)
+                                {
+                                    Console.WriteLine("hij voegt hem bij p2 toe");
+                                    Server.game.player2Grid.Add(d.data.cell, false);
+                                }
+                            }
+
+                            if(Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                            {
+                                Console.WriteLine("both players choose 3 cells, lets begin");
+                                Server.game.gameState = GameState.Playing;
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    {
+                                        type = "GAMESTATECHANGE",
+                                        data = new GameStateChangePacket()
+                                        {
+                                            state = Server.game.gameState.ToString()
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                    }
                 //case "READYUP":
                 //    {
                 //        DataPacket<ReadyUpPacket> d = data.GetData<ReadyUpPacket>();

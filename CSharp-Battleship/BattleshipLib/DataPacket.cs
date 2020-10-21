@@ -54,6 +54,12 @@ namespace BattleshipLib
         public string state;
     }
 
+    public class CellPackage : DAbstract
+    {
+        public bool isPlayer1;
+        public string cell;
+    }
+
     public class ChooseGridPackage : DAbstract
     {
         public string name;
@@ -64,7 +70,6 @@ namespace BattleshipLib
     public class ReadyUpPacket : DAbstract
     {
         public bool isPlayer1;
-        public string[] boatPositions;
     }
 
     public class ReadyUpResponse : DAbstract

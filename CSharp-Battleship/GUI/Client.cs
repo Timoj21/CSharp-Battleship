@@ -115,6 +115,18 @@ namespace GUI
             }
         }
 
+        internal void SendCell(bool isPlayer1, string cell)
+        {
+            SendData(new DataPacket<CellPackage>()
+            {
+                type = "CELL",
+                data = new CellPackage()
+                {
+                    isPlayer1 = isPlayer1,
+                    cell = cell
+                }
+            });
+        }
 
         internal void SendBattlelogMessage(string v)
         {
@@ -141,15 +153,14 @@ namespace GUI
             }) ;
         }
 
-        internal void SendReadyUp(bool isPlayer1, string[] boatPositions)
+        internal void SendReadyUp(bool isPlayer1)
         {
             SendData(new DataPacket<ReadyUpPacket>()
             {
                 type = "READYUP",
                 data = new ReadyUpPacket()
                 {
-                    isPlayer1 = isPlayer1,
-                    boatPositions = boatPositions
+                    isPlayer1 = isPlayer1
                 }
             });
         }
@@ -191,6 +202,18 @@ namespace GUI
                     grid = grid
                 }
             });
+        }
+
+        public void SendData(DataPacket<CellPackage> data)
+        {
+            // create the sendBuffer based on the message
+            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+            // append the message length (in bytes)
+            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+            // send the message
+            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
         }
 
         public void SendData(DataPacket<BattlelogPacket> data)
