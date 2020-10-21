@@ -53,6 +53,16 @@ namespace BattleshipLib
         public string name;
         public int game;
         public Dictionary<string, bool> grid;
+    }
 
+    public class ReadyUpPacket : DAbstract
+    {
+        public bool isPlayer1;
+        public string[] boatPositions;
+    }
+
+    public class ReadyUpResponse : DAbstract
+    {
+        public bool ready;
     }
 }

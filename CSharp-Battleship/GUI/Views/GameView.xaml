@@ -32,6 +32,10 @@
             <Label Content="00:00"/>
         </StackPanel>
 
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
+            <Button x:Name="ReadyUpButton" Content="Ready Up" Command="{Binding readyUpButtonCommand}"/>
+        </StackPanel>
+
         <Grid x:Name="enemyGrid" Grid.Row="0" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
