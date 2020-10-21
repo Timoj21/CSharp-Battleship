@@ -19,7 +19,14 @@ namespace FileIO
 
             string filepath = @"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt";
             List<string> lines = new List<string>();
-            lines = File.ReadAllLines(filepath).ToList();
+            try
+            {
+                lines = File.ReadAllLines(filepath).ToList();
+            }
+            catch
+            {
+                Console.WriteLine("Wrong filepath");
+            }
             int counter = lines.Count + 1;
 
             lines.Add(playername + " won game " + counter + "!");
