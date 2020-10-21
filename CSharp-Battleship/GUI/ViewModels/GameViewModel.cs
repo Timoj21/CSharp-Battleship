@@ -13,6 +13,7 @@ namespace GUI.ViewModels
     public class GameViewModel : ObserverableObject
     {
         private MainViewModel MainViewModel { get; set; }
+        private Client client;
         public string battlelogTextBlock { get; set; }
 
         public ICommand gridButtonCommand { get; set; }
@@ -20,11 +21,14 @@ namespace GUI.ViewModels
         public ICommand readyUpButtonCommand { get; set; }
 
 
-        public GameViewModel(MainViewModel mainViewModel)
+        public GameViewModel(MainViewModel mainViewModel, Client client)
         {
             this.MainViewModel = mainViewModel;
+            this.client = client;
             battlelogTextBlock = "Welcome to Battleship\nChoose 3 cells and then ready up\n";
-            MainViewModel.client.OnReadyUpReceived += Client_OnReadyUpReceived;
+            this.client.OnReadyUpReceived += Client_OnReadyUpReceived;
+            this.client.OnBattlelogReceived += Client_OnBattlelogReceived;
+            this.client.OnAttackReceived += Client_OnAttackReceived;
 
             gridButtonCommand = new RelayCommand(() =>
             {
@@ -38,38 +42,60 @@ namespace GUI.ViewModels
 
         }
 
+        private void Client_OnAttackReceived(bool hit)
+        {
+            if (MainViewModel.player.Turn)
+            {
+                this.client.SendBattlelogMessage("true");
+            } else
+            {
+                this.client.SendBattlelogMessage("false");
+            }
+        }
+
+        private void Client_OnBattlelogReceived(string message)
+        {
+            this.battlelogTextBlock += message;
+        }
+
         private void Client_OnReadyUpReceived(bool state)
         {
             if (state)
             {
-                if (MainViewModel.player.isPlayer1)
-                {
-                    battlelogTextBlock += "Its player 1 its turn";
-                    MainViewModel.player.Turn = true;
-                }
+                this.client.SendBattlelogMessage("Its player 1 its turn\n");
+            }
+
+            if (MainViewModel.player.isPlayer1)
+            {
+                MainViewModel.player.Turn = true;
+            }
+            else
+            {
+                MainViewModel.player.Turn = false;
             }
         }
 
         private void ReadyUpButtonCommandHandler()
         {
-            if(MainViewModel.player.boatPositions.Length == 3)
+            if (MainViewModel.player.boatPositions[2] != null)
             {
-                MainViewModel.client.SendReadyUp(MainViewModel.player.isPlayer1, MainViewModel.player.boatPositions);
+                this.client.SendReadyUp(MainViewModel.player.isPlayer1, MainViewModel.player.boatPositions);
             }
         }
 
         private void GridButtonCommandHandler(object parameter)
         {
-            if(MainViewModel.player.boatPositions.Length != 3)
+            //TODO dit nog aanpassen wanneer de buttons goed werken
+            if(MainViewModel.player.boatPositions[2] == null)
             {
                 MainViewModel.player.boatPositions[0] = "A1";
-                MainViewModel.player.boatPositions[0] = "A2";
-                MainViewModel.player.boatPositions[0] = "A3";
+                MainViewModel.player.boatPositions[1] = "A2";
+                MainViewModel.player.boatPositions[2] = "A3";
             }
 
             if (MainViewModel.player.Turn)
             {
-                MainViewModel.client.SendAttack(MainViewModel.player.isPlayer1, "A1");
+                this.client.SendAttack(MainViewModel.player.isPlayer1, "A1");
             }
         }
     }

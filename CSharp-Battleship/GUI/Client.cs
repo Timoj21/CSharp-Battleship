@@ -11,6 +11,8 @@ namespace GUI
     public delegate void InGameCallback(bool state);
     public delegate void ChooseGridCallback(bool state);
     public delegate void ReadyUpCallback(bool state);
+    public delegate void BattlelogCallback(string message);
+    public delegate void AttackCallback(bool hit);
     public class Client
     {
         private TcpClient client;
@@ -20,7 +22,8 @@ namespace GUI
         public event DataCallback OnDataReceived;
         public event InGameCallback OnInGameReceived;
         public event ReadyUpCallback OnReadyUpReceived;
-
+        public event BattlelogCallback OnBattlelogReceived;
+        public event AttackCallback OnAttackReceived;
 
         private bool inGame = false;
 
@@ -87,7 +90,32 @@ namespace GUI
                         OnReadyUpReceived?.Invoke(d.data.ready);
                         break;
                     }
+                case "BATTLELOGRESPONSE":
+                    {
+                        DataPacket<BattlelogResponse> d = data.GetData<BattlelogResponse>();
+                        OnBattlelogReceived?.Invoke(d.data.message);
+                        break;
+                    }
+                case "ATTACKRESPONSE":
+                    {
+                        DataPacket<AttackResponse> d = data.GetData<AttackResponse>();
+                        OnAttackReceived?.Invoke(d.data.hit);
+                        break;
+                    }
             }
+        }
+
+
+        internal void SendBattlelogMessage(string v)
+        {
+            SendData(new DataPacket<BattlelogPacket>()
+            {
+                type = "BATTLELOGMESSAGE",
+                data = new BattlelogPacket()
+                {
+                    message = v
+                }
+            });
         }
 
         internal void SendAttack(bool isPlayer1, string v)
@@ -152,6 +180,18 @@ namespace GUI
                     grid = grid
                 }
             });
+        }
+
+        public void SendData(DataPacket<BattlelogPacket> data)
+        {
+            // create the sendBuffer based on the message
+            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+            // append the message length (in bytes)
+            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+            // send the message
+            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
         }
 
         public void SendData(DataPacket<AttackPacket> data)

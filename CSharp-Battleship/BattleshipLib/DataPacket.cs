@@ -71,4 +71,21 @@ namespace BattleshipLib
         public bool isPlayer1;
         public string cell;
     }
+
+    public class AttackResponse : DAbstract
+    {
+        public bool hit;
+    }
+
+    public class BattlelogPacket : DAbstract
+    {
+        public string message;
+    }
+
+    public class BattlelogResponse : DAbstract
+    {
+        public string message;
+    }
+
+    
 }

@@ -15,6 +15,8 @@ namespace ServerApplication
 
         public Game(ServerClient player1)
         {
+            player1Grid = new Dictionary<string, bool>();
+            player2Grid = new Dictionary<string, bool>();
             this.players = new List<ServerClient>();
             this.players.Add(player1);
         }

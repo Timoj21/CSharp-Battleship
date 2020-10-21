@@ -10,7 +10,7 @@ namespace GUI.ViewModels
 {
     public class StartViewModel : ObserverableObject
     {
-        //private Client client;
+        private Client client;
         private MainViewModel MainViewModel { get; set; }
         public ICommand joinGameCommand { get; set; }
 
@@ -22,18 +22,18 @@ namespace GUI.ViewModels
 
         public StartViewModel(MainViewModel mainViewModel)
         {
-            //MainViewModel.client = new Client();
-            //this.client = new Client();
-            MainViewModel.client.OnDataReceived += Client_OnDataReceived;
-            MainViewModel.client.OnInGameReceived += Client_OnInGameReceived;
+            
+            this.client = new Client();
+            this.client.OnDataReceived += Client_OnDataReceived;
+            this.client.OnInGameReceived += Client_OnInGameReceived;
             this.MainViewModel = mainViewModel;
             joinGameCommand = new RelayCommand(() =>
             {
                 if (Name != null && Name.Length > 0)
                 {
-                    MainViewModel.client.SendJoinGame(Name);
+                    this.client.SendJoinGame(Name);
                     //this.client.SendJoinGame(Name);
-                    MainViewModel.player = new Player(Name, false);
+                    MainViewModel.player = new Player(Name, true);
                 }
             });
 
@@ -42,8 +42,8 @@ namespace GUI.ViewModels
                 if (Name != null && Name.Length > 0)
                 {
                     //this.client.SendHostGame(Name);
-                    MainViewModel.client.SendHostGame(Name);
-                    MainViewModel.player = new Player(Name, true);
+                    this.client.SendHostGame(Name);
+                    MainViewModel.player = new Player(Name, false);
                 }
             });
         }
@@ -52,7 +52,7 @@ namespace GUI.ViewModels
         {
             if (state)
             {
-                MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel);
+                MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
             }
         }
 

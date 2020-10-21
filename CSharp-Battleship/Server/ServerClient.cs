@@ -106,24 +106,78 @@ namespace ServerApplication
                             Server.games[0].player2Grid.Add(d.data.boatPositions[2], false);
                         }
 
-                        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player1Grid.Count == 3)
+                        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player2Grid.Count == 3)
                         {
-                            SendData(new DataPacket<ReadyUpResponse>()
+                            foreach (ServerClient client in Server.games[0].players)
                             {
-                                type = "READYUPRESPONSE",
-                                data = new ReadyUpResponse()
+                                SendData(client, new DataPacket<ReadyUpResponse>()
                                 {
-                                    ready = true
-                                }
-                            }) ;
+                                    type = "READYUPRESPONSE",
+                                    data = new ReadyUpResponse()
+                                    {
+                                        ready = true
+                                    }
+                                });
+                            }
                         } else
                         {
-                            SendData(new DataPacket<ReadyUpResponse>()
+                            foreach (ServerClient client in Server.games[0].players)
                             {
-                                type = "READYUPRESPONSE",
-                                data = new ReadyUpResponse()
+                                SendData(client, new DataPacket<ReadyUpResponse>()
                                 {
-                                    ready = false
+                                    type = "READYUPRESPONSE",
+                                    data = new ReadyUpResponse()
+                                    {
+                                        ready = false
+                                    }
+                                });
+                            }
+                        }
+                        break;
+                    }
+                case "BATTLELOGMESSAGE":
+                    {
+                        DataPacket<BattlelogPacket> d = data.GetData<BattlelogPacket>();
+                        foreach (ServerClient client in Server.games[0].players)
+                        {
+                            SendData(client, new DataPacket<BattlelogResponse>()
+                            {
+                                type = "BATTLELOGRESPONSE",
+                                data = new BattlelogResponse()
+                                {
+                                    message = d.data.message
+                                }
+                            });
+                        }
+                        break;
+                    }
+                case "ATTACK":
+                    {
+                        DataPacket<AttackPacket> d = data.GetData<AttackPacket>();
+                        bool hit = false;
+                        if (d.data.isPlayer1)
+                        {
+                            if (Server.games[0].player2Grid.ContainsKey(d.data.cell))
+                            {
+                                hit = true;
+                                Server.games[0].player2Grid[d.data.cell] = true;
+                            }
+                        } else if (!d.data.isPlayer1)
+                        {
+                            if (Server.games[0].player1Grid.ContainsKey(d.data.cell))
+                            {
+                                hit = true;
+                                Server.games[0].player1Grid[d.data.cell] = true;
+                            }
+                        }
+                        foreach (ServerClient client in Server.games[0].players)
+                        {
+                            SendData(client, new DataPacket<AttackResponse>()
+                            {
+                                type = "ATTACKRESPONSE",
+                                data = new AttackResponse()
+                                {
+                                    hit = hit
                                 }
                             });
                         }
@@ -132,7 +186,37 @@ namespace ServerApplication
             }
         }
 
-        private void SendData(DataPacket<ReadyUpResponse> data)
+        private void SendData(ServerClient client, DataPacket<AttackResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+            }
+        }
+
+        private void SendData(ServerClient client, DataPacket<BattlelogResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+            }
+        }
+
+        private void SendData(ServerClient client, DataPacket<ReadyUpResponse> data)
         {
             if (this.isConnected)
             {
