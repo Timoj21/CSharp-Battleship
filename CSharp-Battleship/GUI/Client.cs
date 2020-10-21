@@ -13,6 +13,8 @@ namespace GUI
     public delegate void ReadyUpCallback(bool state);
     public delegate void BattlelogCallback(string message);
     public delegate void AttackCallback(bool hit);
+
+    public delegate void GameStateChangeCallback(string gameState);
     public class Client
     {
         private TcpClient client;
@@ -24,6 +26,8 @@ namespace GUI
         public event ReadyUpCallback OnReadyUpReceived;
         public event BattlelogCallback OnBattlelogReceived;
         public event AttackCallback OnAttackReceived;
+
+        public event GameStateChangeCallback OnGameStateChangeReceived;
 
         private bool inGame = false;
 
@@ -69,6 +73,12 @@ namespace GUI
                         DataPacket<HostGameResponse> d = data.GetData<HostGameResponse>();
                         this.inGame = d.data.inGame;
                         OnInGameReceived?.Invoke(this.inGame);
+                        break;
+                    }
+                case "GAMESTATECHANGE":
+                    {
+                        DataPacket<GameStateChangePacket> d = data.GetData<GameStateChangePacket>();
+                        OnGameStateChangeReceived?.Invoke(d.data.state);
                         break;
                     }
                 case "JOINGAMERESPONSE":
@@ -151,7 +161,8 @@ namespace GUI
                 type = "HOSTGAME",
                 data = new HostGamePacket()
                 {
-                    name = name
+                    name = name,
+                    isPlayer1 = true
                 }
             });
         }

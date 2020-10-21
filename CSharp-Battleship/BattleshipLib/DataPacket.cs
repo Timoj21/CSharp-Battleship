@@ -31,6 +31,7 @@ namespace BattleshipLib
     public class HostGamePacket : DAbstract
     {
         public string name;
+        public bool isPlayer1;
     }
 
     public class HostGameResponse : DAbstract
@@ -46,6 +47,11 @@ namespace BattleshipLib
     public class JoinGameResponse : DAbstract
     {
         public bool inGame;
+    }
+
+    public class GameStateChangePacket : DAbstract
+    {
+        public string state;
     }
 
     public class ChooseGridPackage : DAbstract

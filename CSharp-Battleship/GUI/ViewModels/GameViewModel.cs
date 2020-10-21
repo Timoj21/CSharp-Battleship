@@ -25,7 +25,10 @@ namespace GUI.ViewModels
         {
             this.MainViewModel = mainViewModel;
             this.client = client;
-            battlelogTextBlock = "Welcome to Battleship\nChoose 3 cells and then ready up\n";
+            battlelogTextBlock = "Welcome to Battleship\n";
+
+            this.client.OnGameStateChangeReceived += Client_OnGameStateChangeReceived;
+
             this.client.OnReadyUpReceived += Client_OnReadyUpReceived;
             this.client.OnBattlelogReceived += Client_OnBattlelogReceived;
             this.client.OnAttackReceived += Client_OnAttackReceived;
@@ -40,6 +43,33 @@ namespace GUI.ViewModels
                 ReadyUpButtonCommandHandler();
             });
 
+        }
+
+        private void Client_OnGameStateChangeReceived(string gameState)
+        {
+            switch (gameState)
+            {
+                case "Waiting":
+                    {
+                        battlelogTextBlock += "Waiting for player 2\n";
+                        break;
+                    }
+                case "ChooseCells":
+                    {
+                        battlelogTextBlock += "Choose 3 cells and click on ready";
+                        break;
+                    }
+                case "Playing":
+                    {
+
+                        break;
+                    }
+                case "Ended":
+                    {
+
+                        break;
+                    }
+            }
         }
 
         private void Client_OnAttackReceived(bool hit)

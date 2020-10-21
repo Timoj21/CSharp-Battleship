@@ -32,6 +32,7 @@ namespace GUI.ViewModels
                 if (Name != null && Name.Length > 0)
                 {
                     this.client.SendJoinGame(Name);
+                    MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
                     //this.client.SendJoinGame(Name);
                     MainViewModel.player = new Player(Name, true);
                 }
@@ -43,6 +44,7 @@ namespace GUI.ViewModels
                 {
                     //this.client.SendHostGame(Name);
                     this.client.SendHostGame(Name);
+                    MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
                     MainViewModel.player = new Player(Name, false);
                 }
             });
