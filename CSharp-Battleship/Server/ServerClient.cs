@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ServerApplication
 {
-    class ServerClient
+    public class ServerClient
     {
         private TcpClient tcpClient;
         private NetworkStream stream;
@@ -49,48 +49,405 @@ namespace ServerApplication
             {
                 case "JOINGAME":
                     {
-                        foreach (var game in Server.games)
+                        if (Server.game != null)
                         {
-                            if (game.players.Count == 1)
-                            {
-                                game.playerJoin(this);
+                            DataPacket<JoinGamePacket> d = data.GetData<JoinGamePacket>();
 
-                                SendData(new DataPacket<JoinGameResponse>()
+                            Console.WriteLine("Player2 joined the game");
+                            Server.game.AddPlayer(this, d.data.name, false);
+
+                            SendData(new DataPacket<JoinGameResponse>()
+                            {
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
                                 {
-                                    type = "JOINGAMERESPONSE",
-                                    data = new JoinGameResponse()
+                                    joinedGame = true
+                                }
+                            });
+
+                            Console.WriteLine("Choose the cells");
+                            Server.game.gameState = GameState.ChooseCells;
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
                                     {
-                                        inGame = true
+                                        state = Server.game.gameState.ToString()
                                     }
                                 });
-                                break;
                             }
                         }
-                        //Stuur terug dat er geen games beschikbaar zijn
-                        SendData(new DataPacket<JoinGameResponse>()
+                        else
                         {
-                            type = "JOINGAMERESPONSE",
-                            data = new JoinGameResponse()
+                            SendData(new DataPacket<JoinGameResponse>()
                             {
-                                inGame = false
-                            }
-                        });
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
+                                {
+                                    joinedGame = false
+                                }
+                            });
+                        }
                         break;
+                        //foreach (var game in Server.games)
+                        //{
+                        //    if (game.players.Count == 1)
+                        //    {
+                        //        game.playerJoin(this);
+
+                        //        SendData(new DataPacket<JoinGameResponse>()
+                        //        {
+                        //            type = "JOINGAMERESPONSE",
+                        //            data = new JoinGameResponse()
+                        //            {
+                        //                inGame = true
+                        //            }
+                        //        });
+                        //        break;
+                        //    }
+                        //}
+                        ////Stuur terug dat er geen games beschikbaar zijn
+                        //SendData(new DataPacket<JoinGameResponse>()
+                        //{
+                        //    type = "JOINGAMERESPONSE",
+                        //    data = new JoinGameResponse()
+                        //    {
+                        //        inGame = false
+                        //    }
+                        //});
+                        //break;
                     }
                 case "HOSTGAME":
                     {
-                        Server.games.Add(new Game(this));
-                        Console.WriteLine(Server.games.Count);
-                        SendData(new DataPacket<HostGameResponse>()
+                        DataPacket<HostGamePacket> d = data.GetData<HostGamePacket>();
+                        //Server.games.Add(new Game(this));
+
+                        Console.WriteLine("new game started by host");
+                        Server.game = new Game(this, d.data.name, d.data.isPlayer1);
+                        Server.game.gameState = GameState.Waiting;
+                        Console.WriteLine("Waiting for player2");
+
+                        SendGameChange(this, new DataPacket<GameStateChangePacket>()
                         {
-                            type = "HOSTGAMERESPONSE",
-                            data = new HostGameResponse()
+                            type = "GAMESTATECHANGE",
+                            data = new GameStateChangePacket()
                             {
-                                inGame = true
+                                state = Server.game.gameState.ToString()
                             }
                         });
+                        //SendData(new DataPacket<HostGameResponse>()
+                        //{
+                        //    type = "HOSTGAMERESPONSE",
+                        //    data = new HostGameResponse()
+                        //    {
+                        //        inGame = true
+                        //    }
+                        //});
                         break;
                     }
+                case "CELL":
+                    {
+                        DataPacket<CellPackage> d = data.GetData<CellPackage>();
+
+                        if (Server.game.gameState == GameState.ChooseCells)
+                        {
+                            if (d.data.isPlayer1)
+                            {
+                                Console.WriteLine($"Player1 choose {d.data.cell}");
+                                if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
+                                {
+                                    Console.WriteLine("hij voegt hem bij p1 toe");
+                                    Server.game.player1Grid.Add(d.data.cell, false);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Player2 choose {d.data.cell}");
+                                if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3)
+                                {
+                                    Console.WriteLine("hij voegt hem bij p2 toe");
+                                    Server.game.player2Grid.Add(d.data.cell, false);
+                                }
+                            }
+
+                            if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                            {
+                                Console.WriteLine("both players choose 3 cells, lets begin");
+                                Server.game.gameState = GameState.Player1Turn;
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    {
+                                        type = "GAMESTATECHANGE",
+                                        data = new GameStateChangePacket()
+                                        {
+                                            state = Server.game.gameState.ToString()
+                                        }
+                                    });
+                                }
+                            }
+                            break;
+                        }
+                        else if (Server.game.gameState == GameState.Player1Turn)
+                        {
+                            bool hit = false;
+
+                            if(Server.game.player2Grid.ContainsKey(d.data.cell))
+                                {
+                                Console.WriteLine("Player 1 heeft geraakt");
+                                hit = true;
+                                Server.game.player2Grid[d.data.cell] = true;
+                            }
+                                else
+                            {
+                                Console.WriteLine("Player 1 heeft gemist");
+                            }
+
+                            Server.game.gameState = GameState.Player2Turn;
+                            Server.game.CheckWinner(Server.game.player2Grid);
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendData(player.client, new DataPacket<HitMissResponse>()
+                                {
+                                    type = "HITMISSRESPONSE",
+                                    data = new HitMissResponse()
+                                    {
+                                        hit = hit,
+                                        cell = d.data.cell
+                                    }
+                                });
+                            }
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
+                                    {
+                                        state = Server.game.gameState.ToString()
+                                    }
+                                });
+                            }
+                            break;
+                        } else if(Server.game.gameState == GameState.Player2Turn)
+                        {
+                            bool hit = false;
+
+                            if (Server.game.player1Grid.ContainsKey(d.data.cell))
+                            {
+                                Console.WriteLine("Player 2 heeft geraakt");
+                                hit = true;
+                                Server.game.player1Grid[d.data.cell] = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Player 2 heeft gemist");
+                            }
+
+                            Server.game.gameState = GameState.Player1Turn;
+                            Server.game.CheckWinner(Server.game.player1Grid);
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendData(player.client, new DataPacket<HitMissResponse>()
+                                {
+                                    type = "HITMISSRESPONSE",
+                                    data = new HitMissResponse()
+                                    {
+                                        hit = hit,
+                                        cell = d.data.cell
+                                    }
+                                });
+                            }
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
+                                    {
+                                        state = Server.game.gameState.ToString()
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                        break;
+                        //case "READYUP":
+                        //    {
+                        //        DataPacket<ReadyUpPacket> d = data.GetData<ReadyUpPacket>();
+                        //        if (d.data.isPlayer1)
+                        //        {
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[0], false);
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[1], false);
+                        //            Server.games[0].player1Grid.Add(d.data.boatPositions[2], false);
+                        //        } else if (!d.data.isPlayer1)
+                        //        {
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[0], false);
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[1], false);
+                        //            Server.games[0].player2Grid.Add(d.data.boatPositions[2], false);
+                        //        }
+
+                        //        if(Server.games[0].player1Grid.Count == 3 && Server.games[0].player2Grid.Count == 3)
+                        //        {
+                        //            foreach (ServerClient client in Server.games[0].players)
+                        //            {
+                        //                SendData(client, new DataPacket<ReadyUpResponse>()
+                        //                {
+                        //                    type = "READYUPRESPONSE",
+                        //                    data = new ReadyUpResponse()
+                        //                    {
+                        //                        ready = true
+                        //                    }
+                        //                });
+                        //            }
+                        //        } else
+                        //        {
+                        //            foreach (ServerClient client in Server.games[0].players)
+                        //            {
+                        //                SendData(client, new DataPacket<ReadyUpResponse>()
+                        //                {
+                        //                    type = "READYUPRESPONSE",
+                        //                    data = new ReadyUpResponse()
+                        //                    {
+                        //                        ready = false
+                        //                    }
+                        //                });
+                        //            }
+                        //        }
+                        //        break;
+                        //    }
+                        //case "BATTLELOGMESSAGE":
+                        //    {
+                        //        DataPacket<BattlelogPacket> d = data.GetData<BattlelogPacket>();
+                        //        foreach (ServerClient client in Server.games[0].players)
+                        //        {
+                        //            SendData(client, new DataPacket<BattlelogResponse>()
+                        //            {
+                        //                type = "BATTLELOGRESPONSE",
+                        //                data = new BattlelogResponse()
+                        //                {
+                        //                    message = d.data.message
+                        //                }
+                        //            });
+                        //        }
+                        //        break;
+                        //    }
+                        //case "ATTACK":
+                        //    {
+                        //        DataPacket<AttackPacket> d = data.GetData<AttackPacket>();
+                        //        bool hit = false;
+                        //        if (d.data.isPlayer1)
+                        //        {
+                        //            if (Server.games[0].player2Grid.ContainsKey(d.data.cell))
+                        //            {
+                        //                hit = true;
+                        //                Server.games[0].player2Grid[d.data.cell] = true;
+                        //            }
+                        //        } else if (!d.data.isPlayer1)
+                        //        {
+                        //            if (Server.games[0].player1Grid.ContainsKey(d.data.cell))
+                        //            {
+                        //                hit = true;
+                        //                Server.games[0].player1Grid[d.data.cell] = true;
+                        //            }
+                        //        }
+                        //        foreach (ServerClient client in Server.games[0].players)
+                        //        {
+                        //            SendData(client, new DataPacket<AttackResponse>()
+                        //            {
+                        //                type = "ATTACKRESPONSE",
+                        //                data = new AttackResponse()
+                        //                {
+                        //                    hit = hit
+                        //                }
+                        //            });
+                        //        }
+                        //        break;
+                        //    }
+                    }
+            }
+        }
+
+        private void SendGameChange(ServerClient client, DataPacket<GameStateChangePacket> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+            }
+        }
+
+            private void SendData(ServerClient client, DataPacket<HitMissResponse> data)
+            {
+                if (this.isConnected)
+                {
+                    // create the sendBuffer based on the message
+                    List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                    // append the message length (in bytes)
+                    sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                    // send the message
+                    client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+                }
+            }
+
+            private void SendData(ServerClient client, DataPacket<AttackResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+            }
+        }
+
+        private void SendData(ServerClient client, DataPacket<BattlelogResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+            }
+        }
+
+        private void SendData(ServerClient client, DataPacket<ReadyUpResponse> data)
+        {
+            if (this.isConnected)
+            {
+                // create the sendBuffer based on the message
+                List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                // append the message length (in bytes)
+                sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                // send the message
+                this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
             }
         }
 

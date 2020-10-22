@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Command;
+using GUI.Models;
 using GUI.Utils;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,12 @@ namespace GUI.ViewModels
 
         public StartViewModel(MainViewModel mainViewModel)
         {
+            
             this.client = new Client();
             this.client.OnDataReceived += Client_OnDataReceived;
-            this.client.OnInGameReceived += Client_OnInGameReceived;
+
+            this.client.OnJoinedGameReceived += Client_OnJoinedGameReceived;
+
             this.MainViewModel = mainViewModel;
             joinGameCommand = new RelayCommand(() =>
             {
@@ -37,17 +41,20 @@ namespace GUI.ViewModels
             {
                 if (Name != null && Name.Length > 0)
                 {
+                    //this.client.SendHostGame(Name);
                     this.client.SendHostGame(Name);
+                    MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
+                    MainViewModel.player = new Player(Name, true);
                 }
             });
         }
 
-        private void Client_OnInGameReceived(bool state)
+        private void Client_OnJoinedGameReceived(bool state)
         {
             if (state)
             {
-                MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel);
-                MainViewModel.players.Add(new Models.Player(Name));
+                MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
+                MainViewModel.player = new Player(Name, false);
             }
         }
 

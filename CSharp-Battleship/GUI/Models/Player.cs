@@ -11,13 +11,18 @@ namespace GUI.Models
 
         public string Name { get; set; }
 
+        public bool isPlayer1 { get; set; }
+
         public bool Turn { get; set; }
 
-        public List<string> boatPositions { get; set; }
+        public string[] boatPositions { get; set; }
 
-        public Player(string name)
+        public Player(string name, bool isPlayer1)
         {
             this.Name = name;
+            this.isPlayer1 = isPlayer1;
+            this.Turn = true;
+            this.boatPositions = new string[3];
         }
     }
 }
