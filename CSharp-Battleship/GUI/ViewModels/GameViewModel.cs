@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using GUI.Models;
 using GUI.Utils;
+using GUI.ViewModels.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace GUI.ViewModels
         public ICommand gridButtonCommand { get; set; }
 
         public ICommand readyUpButtonCommand { get; set; }
+
+        public ParameterCommand ParameterCommand { get; set; }
 
         private int tempTimerP1 { get; set; }
         private int tempTimerp2 { get; set; }
@@ -40,15 +43,24 @@ namespace GUI.ViewModels
             this.client.OnAttackReceived += Client_OnAttackReceived;
 
 
+            gridButtonCommand = new RelayCommand<string>((s) => GridButtonCommandHandler(s));
+
             //gridButtonCommand = new RelayCommand(() =>
             //{
-            //    GridButtonCommandHandler(gridButtonCommand);
+            //    GridButtonCommandHandler();
             //});
 
-            //readyUpButtonCommand = new RelayCommand(() =>
-            //{
-            //    ReadyUpButtonCommandHandler();
-            //});
+            //gridButtonCommand = new RelayCommand<object>(GridButtonCommandHandler);
+
+            readyUpButtonCommand = new RelayCommand(() =>
+            {
+                ReadyUpButtonCommandHandler();
+            });
+
+        }
+
+        public void ParameterMethod(string cell)
+        {
 
         }
 
@@ -139,13 +151,16 @@ namespace GUI.ViewModels
 
         private void GridButtonCommandHandler(object parameter)
         {
+            var str = parameter as string;
+
+
             if (MainViewModel.player.isPlayer1)
             {
-                this.client.SendCell(MainViewModel.player.isPlayer1, "A" + tempTimerP1.ToString());
+                this.client.SendCell(MainViewModel.player.isPlayer1, str);
                 this.tempTimerP1 += 1;
             } else
             {
-                this.client.SendCell(MainViewModel.player.isPlayer1, "A" + tempTimerp2.ToString());
+                this.client.SendCell(MainViewModel.player.isPlayer1, str);
                 this.tempTimerp2 += 1;
             }
 
