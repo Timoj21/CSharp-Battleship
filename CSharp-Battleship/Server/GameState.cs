@@ -9,7 +9,6 @@ namespace ServerApplication
         CantStart,
         Waiting,
         ChooseCells,
-        Playing,
         Player1Turn,
         Player2Turn,
         Ended

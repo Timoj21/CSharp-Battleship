@@ -24,16 +24,9 @@ namespace GUI
         private NetworkStream stream;
         private byte[] buffer = new byte[4];
 
-        public event DataCallback OnDataReceived;
-        public event ReadyUpCallback OnReadyUpReceived;
-        public event BattlelogCallback OnBattlelogReceived;
-        public event AttackCallback OnAttackReceived;
-
         public event GameStateChangeCallback OnGameStateChangeReceived;
         public event JoinedGameCallback OnJoinedGameReceived;
         public event HitMissCallback OnHitMissReceived;
-
-        private bool inGame = false;
 
         public Client()
         {
@@ -75,8 +68,7 @@ namespace GUI
                 case "HOSTGAMERESPONSE":
                     {
                         DataPacket<HostGameResponse> d = data.GetData<HostGameResponse>();
-                        this.inGame = d.data.inGame;
-                        OnJoinedGameReceived?.Invoke(this.inGame);
+                        OnJoinedGameReceived?.Invoke(d.data.inGame);
                         break;
                     }
                 case "GAMESTATECHANGE":
@@ -89,30 +81,6 @@ namespace GUI
                     {
                         DataPacket<JoinGameResponse> d = data.GetData<JoinGameResponse>();
                         OnJoinedGameReceived?.Invoke(d.data.joinedGame);
-                        break;
-                    }
-                case "CHOOSEGRIDRESPONSE":
-                    {
-                        //DataPacket<ChooseGridResponse> d = data.GetData<ChooseGridResponse>();
-                        
-                        break;
-                    }
-                case "READYUPRESPONSE":
-                    {
-                        DataPacket<ReadyUpResponse> d = data.GetData<ReadyUpResponse>();
-                        OnReadyUpReceived?.Invoke(d.data.ready);
-                        break;
-                    }
-                case "BATTLELOGRESPONSE":
-                    {
-                        DataPacket<BattlelogResponse> d = data.GetData<BattlelogResponse>();
-                        OnBattlelogReceived?.Invoke(d.data.message);
-                        break;
-                    }
-                case "ATTACKRESPONSE":
-                    {
-                        DataPacket<AttackResponse> d = data.GetData<AttackResponse>();
-                        OnAttackReceived?.Invoke(d.data.hit);
                         break;
                     }
                 case "HITMISSRESPONSE":
@@ -133,43 +101,6 @@ namespace GUI
                 {
                     isPlayer1 = isPlayer1,
                     cell = cell
-                }
-            });
-        }
-
-        internal void SendBattlelogMessage(string v)
-        {
-            SendData(new DataPacket<BattlelogPacket>()
-            {
-                type = "BATTLELOGMESSAGE",
-                data = new BattlelogPacket()
-                {
-                    message = v
-                }
-            });
-        }
-
-        internal void SendAttack(bool isPlayer1, string v)
-        {
-            SendData(new DataPacket<AttackPacket>()
-            {
-                type = "ATTACK",
-                data = new AttackPacket()
-                {
-                    isPlayer1 = isPlayer1,
-                    cell = v
-                }
-            }) ;
-        }
-
-        internal void SendReadyUp(bool isPlayer1)
-        {
-            SendData(new DataPacket<ReadyUpPacket>()
-            {
-                type = "READYUP",
-                data = new ReadyUpPacket()
-                {
-                    isPlayer1 = isPlayer1
                 }
             });
         }
@@ -199,69 +130,7 @@ namespace GUI
             });
         }
 
-        public void SendChooseGrid(string name, int game, Dictionary<string, bool> grid)
-        {
-            SendData(new DataPacket<ChooseGridPackage>()
-            {
-                type = "CHOOSEGRID",
-                data = new ChooseGridPackage()
-                {
-                    name = name,
-                    game = game,
-                    grid = grid
-                }
-            });
-        }
-
         public void SendData(DataPacket<CellPackage> data)
-        {
-            // create the sendBuffer based on the message
-            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
-
-            // append the message length (in bytes)
-            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
-
-            // send the message
-            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
-        }
-
-        public void SendData(DataPacket<BattlelogPacket> data)
-        {
-            // create the sendBuffer based on the message
-            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
-
-            // append the message length (in bytes)
-            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
-
-            // send the message
-            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
-        }
-
-        public void SendData(DataPacket<AttackPacket> data)
-        {
-            // create the sendBuffer based on the message
-            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
-
-            // append the message length (in bytes)
-            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
-
-            // send the message
-            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
-        }
-
-        public void SendData(DataPacket<ReadyUpPacket> data)
-        {
-            // create the sendBuffer based on the message
-            List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
-
-            // append the message length (in bytes)
-            sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
-
-            // send the message
-            this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
-        }
-
-        public void SendData(DataPacket<ChooseGridPackage> data)
         {
             // create the sendBuffer based on the message
             List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
