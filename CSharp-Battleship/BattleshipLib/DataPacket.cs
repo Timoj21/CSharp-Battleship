@@ -57,7 +57,7 @@ namespace BattleshipLib
     public class CellPackage : DAbstract
     {
         public bool isPlayer1;
-        public string cell;
+        public int cell;
     }
 
     public class HitMissResponse : DAbstract

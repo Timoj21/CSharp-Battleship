@@ -100,7 +100,7 @@ namespace GUI
                 data = new CellPackage()
                 {
                     isPlayer1 = isPlayer1,
-                    cell = cell
+                    cell = Int32.Parse(cell)
                 }
             });
         }

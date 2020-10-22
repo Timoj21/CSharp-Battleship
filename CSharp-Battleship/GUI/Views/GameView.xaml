@@ -53,35 +53,35 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Button x:Name="A1" Grid.Column="0" Grid.Row="0" Content="A1" Command="{Binding Path=gridButtonCommand}" CommandParameter="A1"/>
-            <Button x:Name="A2" Grid.Column="1" Grid.Row="0" Content="A2" Command="{Binding Path=gridButtonCommand}" CommandParameter="A2"/>
-            <Button x:Name="A3" Grid.Column="2" Grid.Row="0" Content="A3" Command="{Binding Path=gridButtonCommand}" CommandParameter="A3"/>
-            <Button x:Name="A4" Grid.Column="3" Grid.Row="0" Content="A4" Command="{Binding Path=gridButtonCommand}" CommandParameter="A4"/>
-            <Button x:Name="A5" Grid.Column="4" Grid.Row="0" Content="A5" Command="{Binding Path=gridButtonCommand}" CommandParameter="A5"/>
+            <Button x:Name="A1" Grid.Column="0" Grid.Row="0" Content="A1" Command="{Binding Path=gridButtonCommand}" CommandParameter="1"/>
+            <Button x:Name="A2" Grid.Column="1" Grid.Row="0" Content="A2" Command="{Binding Path=gridButtonCommand}" CommandParameter="2"/>
+            <Button x:Name="A3" Grid.Column="2" Grid.Row="0" Content="A3" Command="{Binding Path=gridButtonCommand}" CommandParameter="3"/>
+            <Button x:Name="A4" Grid.Column="3" Grid.Row="0" Content="A4" Command="{Binding Path=gridButtonCommand}" CommandParameter="4"/>
+            <Button x:Name="A5" Grid.Column="4" Grid.Row="0" Content="A5" Command="{Binding Path=gridButtonCommand}" CommandParameter="5"/>
 
-            <Button x:Name="B1" Grid.Column="0" Grid.Row="1" Content="B1" />
-            <Button x:Name="B2" Grid.Column="1" Grid.Row="1" Content="B2" />
-            <Button x:Name="B3" Grid.Column="2" Grid.Row="1" Content="B3" />
-            <Button x:Name="B4" Grid.Column="3" Grid.Row="1" Content="B4" />
-            <Button x:Name="B5" Grid.Column="4" Grid.Row="1" Content="B5" />
+            <Button x:Name="B1" Grid.Column="0" Grid.Row="1" Content="B1" Command="{Binding Path=gridButtonCommand}" CommandParameter="6" />
+            <Button x:Name="B2" Grid.Column="1" Grid.Row="1" Content="B2" Command="{Binding Path=gridButtonCommand}" CommandParameter="7"/>
+            <Button x:Name="B3" Grid.Column="2" Grid.Row="1" Content="B3" Command="{Binding Path=gridButtonCommand}" CommandParameter="8"/>
+            <Button x:Name="B4" Grid.Column="3" Grid.Row="1" Content="B4" Command="{Binding Path=gridButtonCommand}" CommandParameter="9"/>
+            <Button x:Name="B5" Grid.Column="4" Grid.Row="1" Content="B5" Command="{Binding Path=gridButtonCommand}" CommandParameter="10"/>
 
-            <Button x:Name="C1" Grid.Column="0" Grid.Row="2" Content="C1" />
-            <Button x:Name="C2" Grid.Column="1" Grid.Row="2" Content="C2" />
-            <Button x:Name="C3" Grid.Column="2" Grid.Row="2" Content="C3" />
-            <Button x:Name="C4" Grid.Column="3" Grid.Row="2" Content="C4" />
-            <Button x:Name="C5" Grid.Column="4" Grid.Row="2" Content="C5" />
+            <Button x:Name="C1" Grid.Column="0" Grid.Row="2" Content="C1" Command="{Binding Path=gridButtonCommand}" CommandParameter="11"/>
+            <Button x:Name="C2" Grid.Column="1" Grid.Row="2" Content="C2" Command="{Binding Path=gridButtonCommand}" CommandParameter="12"/>
+            <Button x:Name="C3" Grid.Column="2" Grid.Row="2" Content="C3" Command="{Binding Path=gridButtonCommand}" CommandParameter="13"/>
+            <Button x:Name="C4" Grid.Column="3" Grid.Row="2" Content="C4" Command="{Binding Path=gridButtonCommand}" CommandParameter="14"/>
+            <Button x:Name="C5" Grid.Column="4" Grid.Row="2" Content="C5" Command="{Binding Path=gridButtonCommand}" CommandParameter="15"/>
 
-            <Button x:Name="D1" Grid.Column="0" Grid.Row="3" Content="D1" />
-            <Button x:Name="D2" Grid.Column="1" Grid.Row="3" Content="D2" />
-            <Button x:Name="D3" Grid.Column="2" Grid.Row="3" Content="D3" />
-            <Button x:Name="D4" Grid.Column="3" Grid.Row="3" Content="D4" />
-            <Button x:Name="D5" Grid.Column="4" Grid.Row="3" Content="D5" />
+            <Button x:Name="D1" Grid.Column="0" Grid.Row="3" Content="D1" Command="{Binding Path=gridButtonCommand}" CommandParameter="16"/>
+            <Button x:Name="D2" Grid.Column="1" Grid.Row="3" Content="D2" Command="{Binding Path=gridButtonCommand}" CommandParameter="17"/>
+            <Button x:Name="D3" Grid.Column="2" Grid.Row="3" Content="D3" Command="{Binding Path=gridButtonCommand}" CommandParameter="18"/>
+            <Button x:Name="D4" Grid.Column="3" Grid.Row="3" Content="D4" Command="{Binding Path=gridButtonCommand}" CommandParameter="19"/>
+            <Button x:Name="D5" Grid.Column="4" Grid.Row="3" Content="D5" Command="{Binding Path=gridButtonCommand}" CommandParameter="20"/>
 
-            <Button x:Name="E1" Grid.Column="0" Grid.Row="4" Content="E1" />
-            <Button x:Name="E2" Grid.Column="1" Grid.Row="4" Content="E2" />
-            <Button x:Name="E3" Grid.Column="2" Grid.Row="4" Content="E3" />
-            <Button x:Name="E4" Grid.Column="3" Grid.Row="4" Content="E4" />
-            <Button x:Name="E5" Grid.Column="4" Grid.Row="4" Content="E5" />
+            <Button x:Name="E1" Grid.Column="0" Grid.Row="4" Content="E1" Command="{Binding Path=gridButtonCommand}" CommandParameter="21"/>
+            <Button x:Name="E2" Grid.Column="1" Grid.Row="4" Content="E2" Command="{Binding Path=gridButtonCommand}" CommandParameter="22"/>
+            <Button x:Name="E3" Grid.Column="2" Grid.Row="4" Content="E3" Command="{Binding Path=gridButtonCommand}" CommandParameter="23"/>
+            <Button x:Name="E4" Grid.Column="3" Grid.Row="4" Content="E4" Command="{Binding Path=gridButtonCommand}" CommandParameter="24"/>
+            <Button x:Name="E5" Grid.Column="4" Grid.Row="4" Content="E5" Command="{Binding Path=gridButtonCommand}" CommandParameter="25"/>
         </Grid>
 
         <Grid x:Name ="homeGrid" Grid.Row="2" Grid.Column="0" >
@@ -100,35 +100,35 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Button x:Name="F1" Grid.Column="0" Grid.Row="0" Content="F1" />
-            <Button x:Name="F2" Grid.Column="1" Grid.Row="0" Content="F2" />
-            <Button x:Name="F3" Grid.Column="2" Grid.Row="0" Content="F3" />
-            <Button x:Name="F4" Grid.Column="3" Grid.Row="0" Content="F4" />
-            <Button x:Name="F5" Grid.Column="4" Grid.Row="0" Content="F5" />
+            <Button x:Name="F1" Grid.Column="0" Grid.Row="0" Content="F1" Command="{Binding Path=gridButtonCommand}" CommandParameter="26"/>
+            <Button x:Name="F2" Grid.Column="1" Grid.Row="0" Content="F2" Command="{Binding Path=gridButtonCommand}" CommandParameter="27"/>
+            <Button x:Name="F3" Grid.Column="2" Grid.Row="0" Content="F3" Command="{Binding Path=gridButtonCommand}" CommandParameter="28"/>
+            <Button x:Name="F4" Grid.Column="3" Grid.Row="0" Content="F4" Command="{Binding Path=gridButtonCommand}" CommandParameter="29"/>
+            <Button x:Name="F5" Grid.Column="4" Grid.Row="0" Content="F5" Command="{Binding Path=gridButtonCommand}" CommandParameter="30"/>
 
-            <Button x:Name="G1" Grid.Column="0" Grid.Row="1" Content="G1" />
-            <Button x:Name="G2" Grid.Column="1" Grid.Row="1" Content="G2" />
-            <Button x:Name="G3" Grid.Column="2" Grid.Row="1" Content="G3" />
-            <Button x:Name="G4" Grid.Column="3" Grid.Row="1" Content="G4" />
-            <Button x:Name="G5" Grid.Column="4" Grid.Row="1" Content="G5" />
+            <Button x:Name="G1" Grid.Column="0" Grid.Row="1" Content="G1" Command="{Binding Path=gridButtonCommand}" CommandParameter="31"/>
+            <Button x:Name="G2" Grid.Column="1" Grid.Row="1" Content="G2" Command="{Binding Path=gridButtonCommand}" CommandParameter="32"/>
+            <Button x:Name="G3" Grid.Column="2" Grid.Row="1" Content="G3" Command="{Binding Path=gridButtonCommand}" CommandParameter="33"/>
+            <Button x:Name="G4" Grid.Column="3" Grid.Row="1" Content="G4" Command="{Binding Path=gridButtonCommand}" CommandParameter="34"/>
+            <Button x:Name="G5" Grid.Column="4" Grid.Row="1" Content="G5" Command="{Binding Path=gridButtonCommand}" CommandParameter="35"/>
 
-            <Button x:Name="H1" Grid.Column="0" Grid.Row="2" Content="H1" />
-            <Button x:Name="H2" Grid.Column="1" Grid.Row="2" Content="H2" />
-            <Button x:Name="H3" Grid.Column="2" Grid.Row="2" Content="H3" />
-            <Button x:Name="H4" Grid.Column="3" Grid.Row="2" Content="H4" />
-            <Button x:Name="H5" Grid.Column="4" Grid.Row="2" Content="H5" />
+            <Button x:Name="H1" Grid.Column="0" Grid.Row="2" Content="H1" Command="{Binding Path=gridButtonCommand}" CommandParameter="36"/>
+            <Button x:Name="H2" Grid.Column="1" Grid.Row="2" Content="H2" Command="{Binding Path=gridButtonCommand}" CommandParameter="37"/>
+            <Button x:Name="H3" Grid.Column="2" Grid.Row="2" Content="H3" Command="{Binding Path=gridButtonCommand}" CommandParameter="38"/>
+            <Button x:Name="H4" Grid.Column="3" Grid.Row="2" Content="H4" Command="{Binding Path=gridButtonCommand}" CommandParameter="39"/>
+            <Button x:Name="H5" Grid.Column="4" Grid.Row="2" Content="H5" Command="{Binding Path=gridButtonCommand}" CommandParameter="40"/>
 
-            <Button x:Name="I1" Grid.Column="0" Grid.Row="3" Content="I1" />
-            <Button x:Name="I2" Grid.Column="1" Grid.Row="3" Content="I2" />
-            <Button x:Name="I3" Grid.Column="2" Grid.Row="3" Content="I3" />
-            <Button x:Name="I4" Grid.Column="3" Grid.Row="3" Content="I4" />
-            <Button x:Name="I5" Grid.Column="4" Grid.Row="3" Content="I5" />
+            <Button x:Name="I1" Grid.Column="0" Grid.Row="3" Content="I1" Command="{Binding Path=gridButtonCommand}" CommandParameter="41"/>
+            <Button x:Name="I2" Grid.Column="1" Grid.Row="3" Content="I2" Command="{Binding Path=gridButtonCommand}" CommandParameter="42"/>
+            <Button x:Name="I3" Grid.Column="2" Grid.Row="3" Content="I3" Command="{Binding Path=gridButtonCommand}" CommandParameter="43"/>
+            <Button x:Name="I4" Grid.Column="3" Grid.Row="3" Content="I4" Command="{Binding Path=gridButtonCommand}" CommandParameter="44"/>
+            <Button x:Name="I5" Grid.Column="4" Grid.Row="3" Content="I5" Command="{Binding Path=gridButtonCommand}" CommandParameter="45"/>
 
-            <Button x:Name="J1" Grid.Column="0" Grid.Row="4" Content="J1" />
-            <Button x:Name="J2" Grid.Column="1" Grid.Row="4" Content="J2" />
-            <Button x:Name="J3" Grid.Column="2" Grid.Row="4" Content="J3" />
-            <Button x:Name="J4" Grid.Column="3" Grid.Row="4" Content="J4" />
-            <Button x:Name="J5" Grid.Column="4" Grid.Row="4" Content="J5" />
+            <Button x:Name="J1" Grid.Column="0" Grid.Row="4" Content="J1" Command="{Binding Path=gridButtonCommand}" CommandParameter="46"/>
+            <Button x:Name="J2" Grid.Column="1" Grid.Row="4" Content="J2" Command="{Binding Path=gridButtonCommand}" CommandParameter="47"/>
+            <Button x:Name="J3" Grid.Column="2" Grid.Row="4" Content="J3" Command="{Binding Path=gridButtonCommand}" CommandParameter="48"/>
+            <Button x:Name="J4" Grid.Column="3" Grid.Row="4" Content="J4" Command="{Binding Path=gridButtonCommand}" CommandParameter="49"/>
+            <Button x:Name="J5" Grid.Column="4" Grid.Row="4" Content="J5" Command="{Binding Path=gridButtonCommand}" CommandParameter="50"/>
         </Grid>
     </Grid>
 </UserControl>

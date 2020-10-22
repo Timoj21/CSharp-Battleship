@@ -118,40 +118,43 @@ namespace ServerApplication
 
                         if (Server.game.gameState == GameState.ChooseCells)
                         {
-                            if (d.data.isPlayer1)
+                            if (d.data.cell > 25)
                             {
-                                Console.WriteLine($"Player1 choose {d.data.cell}");
-                                if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
+                                if (d.data.isPlayer1)
                                 {
-                                    Console.WriteLine("hij voegt hem bij p1 toe");
-                                    Server.game.player1Grid.Add(d.data.cell, false);
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Player2 choose {d.data.cell}");
-                                if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3)
-                                {
-                                    Console.WriteLine("hij voegt hem bij p2 toe");
-                                    Server.game.player2Grid.Add(d.data.cell, false);
-                                }
-                            }
-
-                            if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
-                            {
-                                Console.WriteLine("both players choose 3 cells, lets begin");
-                                Server.game.gameState = GameState.Player1Turn;
-
-                                foreach (Player player in Server.game.players)
-                                {
-                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    Console.WriteLine($"Player1 choose {d.data.cell}");
+                                    if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3 && !Server.game.player1Grid.ContainsKey(d.data.cell.ToString()))
                                     {
-                                        type = "GAMESTATECHANGE",
-                                        data = new GameStateChangePacket()
+                                        Console.WriteLine("hij voegt hem bij p1 toe");
+                                        Server.game.player1Grid.Add(d.data.cell.ToString(), false);
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Player2 choose {d.data.cell}");
+                                    if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3! && Server.game.player2Grid.ContainsKey(d.data.cell.ToString()))
+                                    {
+                                        Console.WriteLine("hij voegt hem bij p2 toe");
+                                        Server.game.player2Grid.Add(d.data.cell.ToString(), false);
+                                    }
+                                }
+
+                                if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                                {
+                                    Console.WriteLine("both players choose 3 cells, lets begin");
+                                    Server.game.gameState = GameState.Player1Turn;
+
+                                    foreach (Player player in Server.game.players)
+                                    {
+                                        SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
                                         {
-                                            state = Server.game.gameState.ToString()
-                                        }
-                                    });
+                                            type = "GAMESTATECHANGE",
+                                            data = new GameStateChangePacket()
+                                            {
+                                                state = Server.game.gameState.ToString()
+                                            }
+                                        });
+                                    }
                                 }
                             }
                             break;
@@ -159,12 +162,12 @@ namespace ServerApplication
                         else if (Server.game.gameState == GameState.Player1Turn)
                         {
                             bool hit = false;
-
-                            if(Server.game.player2Grid.ContainsKey(d.data.cell))
+                            int cell = d.data.cell + 25;
+                            if(Server.game.player2Grid.ContainsKey(cell.ToString()))
                                 {
                                 Console.WriteLine("Player 1 heeft geraakt");
                                 hit = true;
-                                Server.game.player2Grid[d.data.cell] = true;
+                                Server.game.player2Grid[cell.ToString()] = true;
                             }
                                 else
                             {
@@ -182,7 +185,7 @@ namespace ServerApplication
                                     data = new HitMissResponse()
                                     {
                                         hit = hit,
-                                        cell = d.data.cell
+                                        cell = cell.ToString()
                                     }
                                 });
                             }
@@ -202,12 +205,12 @@ namespace ServerApplication
                         } else if(Server.game.gameState == GameState.Player2Turn)
                         {
                             bool hit = false;
-
-                            if (Server.game.player1Grid.ContainsKey(d.data.cell))
+                            int cell = d.data.cell + 25;
+                            if (Server.game.player1Grid.ContainsKey(cell.ToString()))
                             {
                                 Console.WriteLine("Player 2 heeft geraakt");
                                 hit = true;
-                                Server.game.player1Grid[d.data.cell] = true;
+                                Server.game.player1Grid[cell.ToString()] = true;
                             }
                             else
                             {
@@ -225,7 +228,7 @@ namespace ServerApplication
                                     data = new HitMissResponse()
                                     {
                                         hit = hit,
-                                        cell = d.data.cell
+                                        cell = cell.ToString()
                                     }
                                 });
                             }
