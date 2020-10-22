@@ -42,6 +42,7 @@ namespace ServerApplication
                     amount++;
                 }
             }
+            Console.WriteLine("amount = " + amount);
             if(amount == 3)
             {
                 this.gameState = GameState.Ended;

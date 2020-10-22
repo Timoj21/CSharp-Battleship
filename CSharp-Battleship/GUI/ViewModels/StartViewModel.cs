@@ -44,7 +44,7 @@ namespace GUI.ViewModels
                     //this.client.SendHostGame(Name);
                     this.client.SendHostGame(Name);
                     MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
-                    MainViewModel.player = new Player(Name, false);
+                    MainViewModel.player = new Player(Name, true);
                 }
             });
         }
@@ -54,7 +54,7 @@ namespace GUI.ViewModels
             if (state)
             {
                 MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
-                MainViewModel.player = new Player(Name, true);
+                MainViewModel.player = new Player(Name, false);
             }
         }
 

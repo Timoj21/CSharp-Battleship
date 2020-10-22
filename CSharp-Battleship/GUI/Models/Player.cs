@@ -21,7 +21,7 @@ namespace GUI.Models
         {
             this.Name = name;
             this.isPlayer1 = isPlayer1;
-            this.Turn = false;
+            this.Turn = true;
             this.boatPositions = new string[3];
         }
     }

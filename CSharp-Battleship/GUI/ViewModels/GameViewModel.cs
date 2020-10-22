@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using GUI.Models;
 using GUI.Utils;
-using GUI.ViewModels.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +20,6 @@ namespace GUI.ViewModels
 
         public ICommand readyUpButtonCommand { get; set; }
 
-        public ParameterCommand ParameterCommand { get; set; }
 
         private int tempTimerP1 { get; set; }
         private int tempTimerp2 { get; set; }
@@ -56,11 +54,6 @@ namespace GUI.ViewModels
             {
                 ReadyUpButtonCommandHandler();
             });
-
-        }
-
-        public void ParameterMethod(string cell)
-        {
 
         }
 
@@ -100,9 +93,48 @@ namespace GUI.ViewModels
                         }
                         break;
                     }
+                case "Player1Turn":
+                    {
+                        battlelogTextBlock += "Its player 1 his turn\n";
+                        if (MainViewModel.player.isPlayer1)
+                        {
+                            MainViewModel.player.Turn = true;
+                        } else
+                        {
+                            MainViewModel.player.Turn = false;
+                        }
+                        break;
+                    }
+                case "Player2Turn":
+                    {
+                        battlelogTextBlock += "Its player 2 his turn\n";
+                        if (MainViewModel.player.isPlayer1)
+                        {
+                            MainViewModel.player.Turn = false;
+                        }
+                        else
+                        {
+                            MainViewModel.player.Turn = true;
+                        }
+                        break;
+                    }
                 case "Ended":
                     {
+                        if(MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock = "Player 1 won!\n";
+                        } else if(!MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock = "Player 2 won!\n";
+                        } else if (MainViewModel.player.isPlayer1 && !MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock = "Player 2 won!\n";
+                        } else if (!MainViewModel.player.isPlayer1 && !MainViewModel.player.Turn)
+                        {
+                            battlelogTextBlock = "Player 1 won!\n";
+                        }
 
+                        MainViewModel.player.Turn = false;
                         break;
                     }
             }
@@ -151,30 +183,11 @@ namespace GUI.ViewModels
 
         private void GridButtonCommandHandler(object parameter)
         {
-            var str = parameter as string;
-
-
-            if (MainViewModel.player.isPlayer1)
+            if (MainViewModel.player.Turn)
             {
+                var str = parameter as string;
                 this.client.SendCell(MainViewModel.player.isPlayer1, str);
-                this.tempTimerP1 += 1;
-            } else
-            {
-                this.client.SendCell(MainViewModel.player.isPlayer1, str);
-                this.tempTimerp2 += 1;
             }
-
-            //if(MainViewModel.player.boatPositions[2] == null)
-            //{
-            //    MainViewModel.player.boatPositions[0] = "A1";
-            //    MainViewModel.player.boatPositions[1] = "A2";
-            //    MainViewModel.player.boatPositions[2] = "A3";
-            //}
-
-            //if (MainViewModel.player.Turn)
-            //{
-            //    this.client.SendAttack(MainViewModel.player.isPlayer1, "A1");
-            //}
         }
     }
 }
