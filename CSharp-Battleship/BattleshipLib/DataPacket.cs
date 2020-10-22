@@ -65,44 +65,4 @@ namespace BattleshipLib
         public bool hit;
         public string cell;
     }
-
-    public class ChooseGridPackage : DAbstract
-    {
-        public string name;
-        public int game;
-        public Dictionary<string, bool> grid;
-    }
-
-    public class ReadyUpPacket : DAbstract
-    {
-        public bool isPlayer1;
-    }
-
-    public class ReadyUpResponse : DAbstract
-    {
-        public bool ready;
-    }
-
-    public class AttackPacket : DAbstract
-    {
-        public bool isPlayer1;
-        public string cell;
-    }
-
-    public class AttackResponse : DAbstract
-    {
-        public bool hit;
-    }
-
-    public class BattlelogPacket : DAbstract
-    {
-        public string message;
-    }
-
-    public class BattlelogResponse : DAbstract
-    {
-        public string message;
-    }
-
-    
 }

@@ -10,9 +10,6 @@ namespace ServerApplication
         public Dictionary<string, bool> player1Grid { get; set; }
         public Dictionary<string, bool> player2Grid { get; set; }
         public GameState gameState { get; set; }
-        private bool isPlayer1 { get; set; }
-
-
 
         public Game(ServerClient player, string name, bool isPlayer1)
         {
@@ -20,11 +17,6 @@ namespace ServerApplication
             player2Grid = new Dictionary<string, bool>();
             this.players = new List<Player>();
             this.players.Add(new Player(player, name, isPlayer1));
-        }
-
-        public void playerJoin(ServerClient player2)
-        {
-            //this.players.Add(player2);
         }
 
         public void AddPlayer(ServerClient client, string name, bool isPlayer1)
@@ -42,7 +34,6 @@ namespace ServerApplication
                     amount++;
                 }
             }
-            Console.WriteLine("amount = " + amount);
             if(amount == 3)
             {
                 this.gameState = GameState.Ended;

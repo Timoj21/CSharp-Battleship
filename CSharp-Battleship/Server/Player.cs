@@ -9,14 +9,12 @@ namespace ServerApplication
         public ServerClient client { get; set; }
         public string name { get; set; }
         private bool isPlayer1 { get; set; }
-        private Dictionary<string, bool> boatPositions { get; set; }
 
         public Player(ServerClient client, string name, bool isPlayer1)
         {
             this.client = client;
             this.name = name;
             this.isPlayer1 = isPlayer1;
-            this.boatPositions = new Dictionary<string, bool>();
         }
 
     }
