@@ -132,14 +132,14 @@ namespace ServerApplication
                                 else
                                 {
                                     Console.WriteLine($"Player2 choose {d.data.cell}");
-                                    if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3! && Server.game.player2Grid.ContainsKey(d.data.cell.ToString()))
+                                    if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3 && !Server.game.player2Grid.ContainsKey(d.data.cell.ToString()))
                                     {
                                         Console.WriteLine("hij voegt hem bij p2 toe");
                                         Server.game.player2Grid.Add(d.data.cell.ToString(), false);
                                     }
                                 }
-
-                                if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                                
+                                if (Server.game.player1Grid.Count == 3 && Server.game.player2Grid.Count == 3)
                                 {
                                     Console.WriteLine("both players choose 3 cells, lets begin");
                                     Server.game.gameState = GameState.Player1Turn;
