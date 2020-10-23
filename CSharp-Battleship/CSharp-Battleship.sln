@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipLib", "Battleship
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerApplication", "Server\ServerApplication.csproj", "{E1478711-71E5-4419-9764-2D42744CC61C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileIO", "FileIO\FileIO.csproj", "{050C5614-08AE-4C11-9197-D532ED1F4035}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileIO", "FileIO\FileIO.csproj", "{050C5614-08AE-4C11-9197-D532ED1F4035}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{52DD9903-DB16-413C-8221-5CF27A4ECA43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{050C5614-08AE-4C11-9197-D532ED1F4035}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{050C5614-08AE-4C11-9197-D532ED1F4035}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{050C5614-08AE-4C11-9197-D532ED1F4035}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52DD9903-DB16-413C-8221-5CF27A4ECA43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52DD9903-DB16-413C-8221-5CF27A4ECA43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52DD9903-DB16-413C-8221-5CF27A4ECA43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52DD9903-DB16-413C-8221-5CF27A4ECA43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

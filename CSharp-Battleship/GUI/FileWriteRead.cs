@@ -7,10 +7,6 @@ using System.Net.Http.Headers;
 namespace FileIO
 {
     public class FileWriteRead
-
-        
-
-       
     {
         public List<string> outcomes { get; set; }
 
@@ -45,7 +41,7 @@ namespace FileIO
 
         }
 
-        public static void ClearFile()
+        public void ClearFile()
         {
             string filepath = "ScoreBoard.txt";
             List<string> clearScoreBoard = new List<string>();

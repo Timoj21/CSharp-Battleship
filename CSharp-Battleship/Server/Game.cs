@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ServerApplication
 {
-    class Game
+    public class Game
     {
         public List<Player> players;
         public Dictionary<string, bool> player1Grid { get; set; }
@@ -24,7 +24,7 @@ namespace ServerApplication
             this.players.Add(new Player(client, name, isPlayer1));
         }
 
-        public void CheckWinner(Dictionary<string, bool> grid)
+        public bool CheckWinner(Dictionary<string, bool> grid)
         {
             int amount = 0;
             foreach(KeyValuePair<string, bool> cell in grid)
@@ -37,7 +37,9 @@ namespace ServerApplication
             if(amount == 3)
             {
                 this.gameState = GameState.Ended;
+                return true;
             }
+            return false;
         }
 
        

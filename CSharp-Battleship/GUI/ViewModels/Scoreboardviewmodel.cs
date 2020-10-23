@@ -15,10 +15,7 @@ namespace GUI.ViewModels
         private FileWriteRead filewriteread { get; set; }
         public List<string> scoreboard { get; set; }
         private MainViewModel MainViewModel { get; set; }
-
-        
-
-
+        public ICommand backButtonCommand { get; set; }
 
         public Scoreboardviewmodel(MainViewModel mainViewModel)
         {
@@ -26,12 +23,10 @@ namespace GUI.ViewModels
             this.MainViewModel.filewriteread.ReadFromFile();
             scoreboard = this.MainViewModel.filewriteread.outcomes;
 
-            //string filepath = @"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt";
-            //List<string> outcomes = new List<string>();
-            //outcomes = File.ReadAllLines(filepath).ToList();
-
-            //scoreboard = outcomes;
-
+            backButtonCommand = new RelayCommand(() =>
+            {
+                MainViewModel.SelectedViewModel = new StartViewModel(this.MainViewModel);
+            });
         }
 
     }

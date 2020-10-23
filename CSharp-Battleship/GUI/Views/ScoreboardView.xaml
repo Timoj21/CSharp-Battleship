@@ -15,7 +15,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Label Content="Scoreboard"/>
-            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Right"/>
+            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Right" Command="{Binding backButtonCommand}"/>
         </StackPanel>
         
         <ListView Grid.Row="1" ItemsSource="{Binding scoreboard}">
