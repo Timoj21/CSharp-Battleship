@@ -7,7 +7,18 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView ItemsSource="{Binding scoreboard}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Label Content="Scoreboard"/>
+            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Right"/>
+        </StackPanel>
+        
+        <ListView Grid.Row="1" ItemsSource="{Binding scoreboard}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
