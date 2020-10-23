@@ -14,7 +14,8 @@
         </Grid.RowDefinitions>
         <Label x:Name="enterNameLabel" Grid.Row="0" Height="30" Width="200" Content="Enter name: " VerticalAlignment="Top"/>
         <TextBox x:Name="nameTextBox" Grid.Row="0" Height="30" Width="200" VerticalAlignment="Bottom" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button x:Name="joinGameButton" Grid.Row="1" Content="Join Game" Command="{Binding Path=joinGameCommand}"/>
-        <Button x:Name="hostGameButton" Grid.Row="2" Content="Host Game" Command="{Binding Path=hostGameCommand}"/>
+        <Button x:Name="joinGameButton" Grid.Row="1" Content="Join Game" Command="{Binding Path=joinGameCommand}" Margin="0,0,0,54"/>
+        <Button x:Name="hostGameButton" Grid.Row="1" Content="Host Game" Command="{Binding Path=hostGameCommand}" Margin="0,96,0,95" Grid.RowSpan="2" RenderTransformOrigin="0.499,0.515"/>
+        <Button x:Name="scoresGameButton" Grid.Row="2" Content="Game Scores" Command="{Binding Path=scoresGameCommand}" Height="95" VerticalAlignment="Top" Margin="0,55,0,0"/>
     </Grid>
 </UserControl>

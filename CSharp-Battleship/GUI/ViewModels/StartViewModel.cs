@@ -1,7 +1,9 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using FileIO;
+using GalaSoft.MvvmLight.Command;
 using GUI.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows.Input;
 
@@ -10,10 +12,13 @@ namespace GUI.ViewModels
     public class StartViewModel : ObserverableObject
     {
         private Client client;
+
         private MainViewModel MainViewModel { get; set; }
         public ICommand joinGameCommand { get; set; }
 
         public ICommand hostGameCommand { get; set; }
+
+        public ICommand scoresGameCommand { get; set; }
 
         public string Name { get; set; }
 
@@ -39,6 +44,11 @@ namespace GUI.ViewModels
                 {
                     this.client.SendHostGame(Name);
                 }
+            });
+
+            scoresGameCommand = new RelayCommand(() =>
+            {
+                MainViewModel.SelectedViewModel = new Scoreboardviewmodel(this.MainViewModel);
             });
         }
 

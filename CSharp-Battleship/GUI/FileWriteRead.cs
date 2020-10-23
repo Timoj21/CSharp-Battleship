@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace FileIO
 {
-    class Program
+    class FileWriteRead
+
+        
+
+       
     {
-        static void Main(string[] args)
-        {
-            ClearFile();
-            WriteToFile("jorn");
-            ReadFromFile();
+        public List<string> outcomes { get; set; }
 
-        }
 
-        public static void WriteToFile(string playername)
+        public void WriteToFile(string playername)
         {
 
             string filepath = @"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt";
@@ -36,11 +36,13 @@ namespace FileIO
 
         }
 
-        public static void ReadFromFile()
+        public void ReadFromFile()
         {
-            StreamReader reader = new StreamReader(@"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt");
-            Console.WriteLine(reader.ReadToEnd());
-            reader.Close();
+            string filepath = @"C:\Users\jornn\Desktop\csharp repo 2\CSharp-Battleship\CSharp-Battleship\ScoreBoard.txt";
+            outcomes = new List<string>();
+            outcomes = File.ReadAllLines(filepath).ToList();
+
+
         }
 
         public static void ClearFile()
@@ -51,6 +53,8 @@ namespace FileIO
             File.WriteAllLines(filepath, clearScoreBoard);
 
         }
+
+
     }
 }
 

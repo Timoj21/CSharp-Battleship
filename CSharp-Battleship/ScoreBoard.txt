@@ -1,1 +1,3 @@
-jorn won game 1!
+Jorn won game 1!
+Timo won game 2!
+Timo won game 3!
