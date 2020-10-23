@@ -3,24 +3,30 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Security.Policy;
 using System.Text;
 
 namespace GUI
 {
     public delegate void DataCallback(string data);
-    public delegate void InGameCallback(bool state);
+    public delegate void JoinedGameCallback(bool state);
     public delegate void ChooseGridCallback(bool state);
-    class Client
+    public delegate void ReadyUpCallback(bool state);
+    public delegate void BattlelogCallback(string message);
+    public delegate void AttackCallback(bool hit);
+
+    public delegate void GameStateChangeCallback(string gameState);
+
+    public delegate void HitMissCallback(string cell, bool hit);
+    public class Client
     {
         private TcpClient client;
         private NetworkStream stream;
         private byte[] buffer = new byte[4];
 
-        public event DataCallback OnDataReceived;
-        public event InGameCallback OnInGameReceived;
-
-
-        private bool inGame = false;
+        public event GameStateChangeCallback OnGameStateChangeReceived;
+        public event JoinedGameCallback OnJoinedGameReceived;
+        public event HitMissCallback OnHitMissReceived;
 
         public Client()
         {
@@ -62,24 +68,41 @@ namespace GUI
                 case "HOSTGAMERESPONSE":
                     {
                         DataPacket<HostGameResponse> d = data.GetData<HostGameResponse>();
-                        this.inGame = d.data.inGame;
-                        OnInGameReceived?.Invoke(this.inGame);
+                        OnJoinedGameReceived?.Invoke(d.data.inGame);
+                        break;
+                    }
+                case "GAMESTATECHANGE":
+                    {
+                        DataPacket<GameStateChangePacket> d = data.GetData<GameStateChangePacket>();
+                        OnGameStateChangeReceived?.Invoke(d.data.state);
                         break;
                     }
                 case "JOINGAMERESPONSE":
                     {
                         DataPacket<JoinGameResponse> d = data.GetData<JoinGameResponse>();
-                        this.inGame = d.data.inGame;
-                        OnInGameReceived?.Invoke(this.inGame);
+                        OnJoinedGameReceived?.Invoke(d.data.joinedGame);
                         break;
                     }
-                case "CHOOSEGRIDRESPONSE":
+                case "HITMISSRESPONSE":
                     {
-                        //DataPacket<ChooseGridResponse> d = data.GetData<ChooseGridResponse>();
-                        
+                        DataPacket<HitMissResponse> d = data.GetData<HitMissResponse>();
+                        OnHitMissReceived?.Invoke(d.data.cell, d.data.hit);
                         break;
                     }
             }
+        }
+
+        internal void SendCell(bool isPlayer1, string cell)
+        {
+            SendData(new DataPacket<CellPackage>()
+            {
+                type = "CELL",
+                data = new CellPackage()
+                {
+                    isPlayer1 = isPlayer1,
+                    cell = Int32.Parse(cell)
+                }
+            });
         }
 
         public void SendHostGame(string name)
@@ -89,7 +112,8 @@ namespace GUI
                 type = "HOSTGAME",
                 data = new HostGamePacket()
                 {
-                    name = name
+                    name = name,
+                    isPlayer1 = true
                 }
             });
         }
@@ -106,21 +130,7 @@ namespace GUI
             });
         }
 
-        public void SendChooseGrid(string name, int game, Dictionary<string, bool> grid)
-        {
-            SendData(new DataPacket<ChooseGridPackage>()
-            {
-                type = "CHOOSEGRID",
-                data = new ChooseGridPackage()
-                {
-                    name = name,
-                    game = game,
-                    grid = grid
-                }
-            });
-        }
-
-        public void SendData(DataPacket<ChooseGridPackage> data)
+        public void SendData(DataPacket<CellPackage> data)
         {
             // create the sendBuffer based on the message
             List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));

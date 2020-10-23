@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ServerApplication
 {
-    class ServerClient
+    public class ServerClient
     {
         private TcpClient tcpClient;
         private NetworkStream stream;
@@ -49,52 +49,215 @@ namespace ServerApplication
             {
                 case "JOINGAME":
                     {
-                        foreach (var game in Server.games)
+                        if (Server.game != null)
                         {
-                            if (game.players.Count == 1)
-                            {
-                                game.playerJoin(this);
+                            DataPacket<JoinGamePacket> d = data.GetData<JoinGamePacket>();
 
-                                SendData(new DataPacket<JoinGameResponse>()
+                            Console.WriteLine("Player2 joined the game");
+                            Server.game.AddPlayer(this, d.data.name, false);
+
+                            SendData(new DataPacket<JoinGameResponse>()
+                            {
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
                                 {
-                                    type = "JOINGAMERESPONSE",
-                                    data = new JoinGameResponse()
+                                    joinedGame = true
+                                }
+                            });
+
+                            Console.WriteLine("Choose the cells");
+                            Server.game.gameState = GameState.ChooseCells;
+
+                            foreach (Player player in Server.game.players)
+                            {
+                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                {
+                                    type = "GAMESTATECHANGE",
+                                    data = new GameStateChangePacket()
                                     {
-                                        inGame = true
+                                        state = Server.game.gameState.ToString()
                                     }
                                 });
-                                break;
                             }
                         }
-                        //Stuur terug dat er geen games beschikbaar zijn
-                        SendData(new DataPacket<JoinGameResponse>()
+                        else
                         {
-                            type = "JOINGAMERESPONSE",
-                            data = new JoinGameResponse()
+                            SendData(new DataPacket<JoinGameResponse>()
                             {
-                                inGame = false
-                            }
-                        });
+                                type = "JOINGAMERESPONSE",
+                                data = new JoinGameResponse()
+                                {
+                                    joinedGame = false
+                                }
+                            });
+                        }
                         break;
                     }
                 case "HOSTGAME":
                     {
-                        Server.games.Add(new Game(this));
-                        Console.WriteLine(Server.games.Count);
-                        SendData(new DataPacket<HostGameResponse>()
+                        DataPacket<HostGamePacket> d = data.GetData<HostGamePacket>();
+
+                        Console.WriteLine("new game started by host");
+                        Server.game = new Game(this, d.data.name, d.data.isPlayer1);
+                        Server.game.gameState = GameState.Waiting;
+                        Console.WriteLine("Waiting for player2");
+
+                        SendGameChange(this, new DataPacket<GameStateChangePacket>()
                         {
-                            type = "HOSTGAMERESPONSE",
-                            data = new HostGameResponse()
+                            type = "GAMESTATECHANGE",
+                            data = new GameStateChangePacket()
                             {
-                                inGame = true
+                                state = Server.game.gameState.ToString()
                             }
                         });
+                        break;
+                    }
+                case "CELL":
+                    {
+                        DataPacket<CellPackage> d = data.GetData<CellPackage>();
+
+                        if (Server.game.gameState == GameState.ChooseCells)
+                        {
+                            if (d.data.cell > 25)
+                            {
+                                if (d.data.isPlayer1)
+                                {
+                                    Console.WriteLine($"Player1 choose {d.data.cell}");
+                                    if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3 && !Server.game.player1Grid.ContainsKey(d.data.cell.ToString()))
+                                    {
+                                        Console.WriteLine("hij voegt hem bij p1 toe");
+                                        Server.game.player1Grid.Add(d.data.cell.ToString(), false);
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Player2 choose {d.data.cell}");
+                                    if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3 && !Server.game.player2Grid.ContainsKey(d.data.cell.ToString()))
+                                    {
+                                        Console.WriteLine("hij voegt hem bij p2 toe");
+                                        Server.game.player2Grid.Add(d.data.cell.ToString(), false);
+                                    }
+                                }
+                                
+                                if (Server.game.player1Grid.Count == 3 && Server.game.player2Grid.Count == 3)
+                                {
+                                    Console.WriteLine("both players choose 3 cells, lets begin");
+                                    Server.game.gameState = GameState.Player1Turn;
+
+                                    foreach (Player player in Server.game.players)
+                                    {
+                                        SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                        {
+                                            type = "GAMESTATECHANGE",
+                                            data = new GameStateChangePacket()
+                                            {
+                                                state = Server.game.gameState.ToString()
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        else if (Server.game.gameState == GameState.Player1Turn)
+                        {
+                            if (d.data.cell < 26)
+                            {
+                                bool hit = false;
+                                int cell = d.data.cell + 25;
+                                if (Server.game.player2Grid.ContainsKey(cell.ToString()))
+                                {
+                                    Console.WriteLine("Player 1 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player2Grid[cell.ToString()] = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Player 1 heeft gemist");
+                                }
+
+                                Server.game.gameState = GameState.Player2Turn;
+                                Server.game.CheckWinner(Server.game.player2Grid);
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendData(player.client, new DataPacket<HitMissResponse>()
+                                    {
+                                        type = "HITMISSRESPONSE",
+                                        data = new HitMissResponse()
+                                        {
+                                            hit = hit,
+                                            cell = cell.ToString()
+                                        }
+                                    });
+                                }
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    {
+                                        type = "GAMESTATECHANGE",
+                                        data = new GameStateChangePacket()
+                                        {
+                                            state = Server.game.gameState.ToString()
+                                        }
+                                    });
+                                }
+                            }
+                            break;
+                        } else if(Server.game.gameState == GameState.Player2Turn)
+                        {
+                            if (d.data.cell < 26)
+                            {
+                                bool hit = false;
+                                int cell = d.data.cell + 25;
+                                if (Server.game.player1Grid.ContainsKey(cell.ToString()))
+                                {
+                                    Console.WriteLine("Player 2 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player1Grid[cell.ToString()] = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Player 2 heeft gemist");
+                                }
+
+                                Server.game.gameState = GameState.Player1Turn;
+                                Server.game.CheckWinner(Server.game.player1Grid);
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendData(player.client, new DataPacket<HitMissResponse>()
+                                    {
+                                        type = "HITMISSRESPONSE",
+                                        data = new HitMissResponse()
+                                        {
+                                            hit = hit,
+                                            cell = cell.ToString()
+                                        }
+                                    });
+                                }
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    {
+                                        type = "GAMESTATECHANGE",
+                                        data = new GameStateChangePacket()
+                                        {
+                                            state = Server.game.gameState.ToString()
+                                        }
+                                    });
+                                }
+                            }
+                            break;
+                        }
                         break;
                     }
             }
         }
 
-        private void SendData(DataPacket<JoinGameResponse> data)
+        private void SendGameChange(ServerClient client, DataPacket<GameStateChangePacket> data)
         {
             if (this.isConnected)
             {
@@ -105,11 +268,26 @@ namespace ServerApplication
                 sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
 
                 // send the message
-                this.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+                client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
             }
         }
 
-        private void SendData(DataPacket<HostGameResponse> data)
+            private void SendData(ServerClient client, DataPacket<HitMissResponse> data)
+            {
+                if (this.isConnected)
+                {
+                    // create the sendBuffer based on the message
+                    List<byte> sendBuffer = new List<byte>(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)));
+
+                    // append the message length (in bytes)
+                    sendBuffer.InsertRange(0, BitConverter.GetBytes(sendBuffer.Count));
+
+                    // send the message
+                    client.stream.Write(sendBuffer.ToArray(), 0, sendBuffer.Count);
+                }
+            }
+
+        private void SendData(DataPacket<JoinGameResponse> data)
         {
             if (this.isConnected)
             {

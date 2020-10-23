@@ -1,4 +1,5 @@
-﻿using GUI.Models;
+﻿using GalaSoft.MvvmLight;
+using GUI.Models;
 using GUI.Utils;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace GUI.ViewModels
 {
     public class MainViewModel : ObserverableObject
     {
-        public ObservableCollection<Player> players { get; set; } = new ObservableCollection<Player>();
+        public Player player { get; set; }
         public ObserverableObject SelectedViewModel { get; set; }
 
         public MainViewModel()

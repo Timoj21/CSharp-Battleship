@@ -10,6 +10,7 @@ namespace ServerApplication
     {
         private TcpListener listener;
         public static List<Game> games;
+        public static Game game { get; set; }
         public Server()
         {
             Console.WriteLine("Hello Server!");
