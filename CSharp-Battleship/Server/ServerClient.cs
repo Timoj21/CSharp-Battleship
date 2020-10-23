@@ -118,29 +118,79 @@ namespace ServerApplication
 
                         if (Server.game.gameState == GameState.ChooseCells)
                         {
-                            if (d.data.isPlayer1)
+                            if (d.data.cell > 25)
                             {
-                                Console.WriteLine($"Player1 choose {d.data.cell}");
-                                if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3)
+                                if (d.data.isPlayer1)
                                 {
-                                    Console.WriteLine("hij voegt hem bij p1 toe");
-                                    Server.game.player1Grid.Add(d.data.cell, false);
+                                    Console.WriteLine($"Player1 choose {d.data.cell}");
+                                    if (Server.game.player1Grid.Count < 3 && Server.game.player1Grid.Count != 3 && !Server.game.player1Grid.ContainsKey(d.data.cell.ToString()))
+                                    {
+                                        Console.WriteLine("hij voegt hem bij p1 toe");
+                                        Server.game.player1Grid.Add(d.data.cell.ToString(), false);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Player2 choose {d.data.cell}");
-                                if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3)
+                                else
                                 {
-                                    Console.WriteLine("hij voegt hem bij p2 toe");
-                                    Server.game.player2Grid.Add(d.data.cell, false);
+                                    Console.WriteLine($"Player2 choose {d.data.cell}");
+                                    if (Server.game.player2Grid.Count < 3 && Server.game.player2Grid.Count != 3 && !Server.game.player2Grid.ContainsKey(d.data.cell.ToString()))
+                                    {
+                                        Console.WriteLine("hij voegt hem bij p2 toe");
+                                        Server.game.player2Grid.Add(d.data.cell.ToString(), false);
+                                    }
                                 }
-                            }
+                                
+                                if (Server.game.player1Grid.Count == 3 && Server.game.player2Grid.Count == 3)
+                                {
+                                    Console.WriteLine("both players choose 3 cells, lets begin");
+                                    Server.game.gameState = GameState.Player1Turn;
 
-                            if (Server.game.player1Grid.Count == 3 & Server.game.player2Grid.Count == 3)
+                                    foreach (Player player in Server.game.players)
+                                    {
+                                        SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                        {
+                                            type = "GAMESTATECHANGE",
+                                            data = new GameStateChangePacket()
+                                            {
+                                                state = Server.game.gameState.ToString()
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        else if (Server.game.gameState == GameState.Player1Turn)
+                        {
+                            if (d.data.cell < 26)
                             {
-                                Console.WriteLine("both players choose 3 cells, lets begin");
-                                Server.game.gameState = GameState.Player1Turn;
+                                bool hit = false;
+                                int cell = d.data.cell + 25;
+                                if (Server.game.player2Grid.ContainsKey(cell.ToString()))
+                                {
+                                    Console.WriteLine("Player 1 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player2Grid[cell.ToString()] = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Player 1 heeft gemist");
+                                }
+
+                                Server.game.gameState = GameState.Player2Turn;
+                                Server.game.CheckWinner(Server.game.player2Grid);
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendData(player.client, new DataPacket<HitMissResponse>()
+                                    {
+                                        type = "HITMISSRESPONSE",
+                                        data = new HitMissResponse()
+                                        {
+                                            hit = hit,
+                                            cell = cell.ToString()
+                                        }
+                                    });
+                                }
 
                                 foreach (Player player in Server.game.players)
                                 {
@@ -155,91 +205,50 @@ namespace ServerApplication
                                 }
                             }
                             break;
-                        }
-                        else if (Server.game.gameState == GameState.Player1Turn)
-                        {
-                            bool hit = false;
-
-                            if(Server.game.player2Grid.ContainsKey(d.data.cell))
-                                {
-                                Console.WriteLine("Player 1 heeft geraakt");
-                                hit = true;
-                                Server.game.player2Grid[d.data.cell] = true;
-                            }
-                                else
-                            {
-                                Console.WriteLine("Player 1 heeft gemist");
-                            }
-
-                            Server.game.gameState = GameState.Player2Turn;
-                            Server.game.CheckWinner(Server.game.player2Grid);
-
-                            foreach (Player player in Server.game.players)
-                            {
-                                SendData(player.client, new DataPacket<HitMissResponse>()
-                                {
-                                    type = "HITMISSRESPONSE",
-                                    data = new HitMissResponse()
-                                    {
-                                        hit = hit,
-                                        cell = d.data.cell
-                                    }
-                                });
-                            }
-
-                            foreach (Player player in Server.game.players)
-                            {
-                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
-                                {
-                                    type = "GAMESTATECHANGE",
-                                    data = new GameStateChangePacket()
-                                    {
-                                        state = Server.game.gameState.ToString()
-                                    }
-                                });
-                            }
-                            break;
                         } else if(Server.game.gameState == GameState.Player2Turn)
                         {
-                            bool hit = false;
-
-                            if (Server.game.player1Grid.ContainsKey(d.data.cell))
+                            if (d.data.cell < 26)
                             {
-                                Console.WriteLine("Player 2 heeft geraakt");
-                                hit = true;
-                                Server.game.player1Grid[d.data.cell] = true;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Player 2 heeft gemist");
-                            }
-
-                            Server.game.gameState = GameState.Player1Turn;
-                            Server.game.CheckWinner(Server.game.player1Grid);
-
-                            foreach (Player player in Server.game.players)
-                            {
-                                SendData(player.client, new DataPacket<HitMissResponse>()
+                                bool hit = false;
+                                int cell = d.data.cell + 25;
+                                if (Server.game.player1Grid.ContainsKey(cell.ToString()))
                                 {
-                                    type = "HITMISSRESPONSE",
-                                    data = new HitMissResponse()
-                                    {
-                                        hit = hit,
-                                        cell = d.data.cell
-                                    }
-                                });
-                            }
-
-                            foreach (Player player in Server.game.players)
-                            {
-                                SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    Console.WriteLine("Player 2 heeft geraakt");
+                                    hit = true;
+                                    Server.game.player1Grid[cell.ToString()] = true;
+                                }
+                                else
                                 {
-                                    type = "GAMESTATECHANGE",
-                                    data = new GameStateChangePacket()
+                                    Console.WriteLine("Player 2 heeft gemist");
+                                }
+
+                                Server.game.gameState = GameState.Player1Turn;
+                                Server.game.CheckWinner(Server.game.player1Grid);
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendData(player.client, new DataPacket<HitMissResponse>()
                                     {
-                                        state = Server.game.gameState.ToString()
-                                    }
-                                });
+                                        type = "HITMISSRESPONSE",
+                                        data = new HitMissResponse()
+                                        {
+                                            hit = hit,
+                                            cell = cell.ToString()
+                                        }
+                                    });
+                                }
+
+                                foreach (Player player in Server.game.players)
+                                {
+                                    SendGameChange(player.client, new DataPacket<GameStateChangePacket>()
+                                    {
+                                        type = "GAMESTATECHANGE",
+                                        data = new GameStateChangePacket()
+                                        {
+                                            state = Server.game.gameState.ToString()
+                                        }
+                                    });
+                                }
                             }
                             break;
                         }
