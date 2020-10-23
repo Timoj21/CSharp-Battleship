@@ -16,6 +16,8 @@ namespace GUI.ViewModels
 
         public ICommand hostGameCommand { get; set; }
 
+        public ICommand scoresGameCommand { get; set; }
+
         public string Name { get; set; }
 
 
@@ -43,6 +45,11 @@ namespace GUI.ViewModels
                     MainViewModel.SelectedViewModel = new GameViewModel(this.MainViewModel, this.client);
                     MainViewModel.player = new Player(Name, true);
                 }
+            });
+
+            scoresGameCommand = new RelayCommand(() =>
+            {
+                MainViewModel.SelectedViewModel = new Scoreboardviewmodel(this.MainViewModel);
             });
         }
 
