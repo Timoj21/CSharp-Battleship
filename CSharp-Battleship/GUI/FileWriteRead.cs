@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 namespace FileIO
 {
-    class FileWriteRead
+    public class FileWriteRead
 
         
 

@@ -84,9 +84,11 @@ namespace GUI.ViewModels
                         if(MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
                         {
                             battlelogTextBlock = "Player 1 won!\n";
+                            MainViewModel.filewriteread.WriteToFile(MainViewModel.player.Name);
                         } else if(!MainViewModel.player.isPlayer1 && MainViewModel.player.Turn)
                         {
                             battlelogTextBlock = "Player 2 won!\n";
+                            MainViewModel.filewriteread.WriteToFile(MainViewModel.player.Name);
                         } else if (MainViewModel.player.isPlayer1 && !MainViewModel.player.Turn)
                         {
                             battlelogTextBlock = "Player 2 won!\n";
@@ -94,7 +96,6 @@ namespace GUI.ViewModels
                         {
                             battlelogTextBlock = "Player 1 won!\n";
                         }
-
                         MainViewModel.player.Turn = false;
                         break;
                     }
