@@ -30,7 +30,7 @@
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Label Content="Time playing: "/>
-            <Label Content="00:00"/>
+            <Label Content="{Binding timer}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">

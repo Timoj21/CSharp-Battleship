@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Windows.Input;
 
 namespace GUI.ViewModels
@@ -15,10 +16,19 @@ namespace GUI.ViewModels
         private MainViewModel MainViewModel { get; set; }
         private Client client;
         public string battlelogTextBlock { get; set; }
+
+        public string timer { get; set; }
         public ICommand gridButtonCommand { get; set; }
+
+        private bool gameEnded;
+
+        private bool timerExists;
 
         public GameViewModel(MainViewModel mainViewModel, Client client)
         {
+            this.gameEnded = true;
+            this.timerExists = false;
+
             this.MainViewModel = mainViewModel;
             this.client = client;
             battlelogTextBlock = "Welcome to Battleship\n";
@@ -40,6 +50,27 @@ namespace GUI.ViewModels
             }
         }
 
+        private void TimerCounter()
+        {
+            int minutes = 0;
+            int seconds = 0;
+
+            while (!gameEnded)
+            {
+                if(seconds == 59)
+                {
+                    minutes++;
+                    seconds = 0;
+                } else
+                {
+                    seconds++;
+                }
+                string timerText = minutes + ":" + seconds;
+                timer = timerText;
+                Thread.Sleep(1000);
+            }
+        }
+
         private void Client_OnGameStateChangeReceived(string gameState)
         {
             switch (gameState)
@@ -56,6 +87,16 @@ namespace GUI.ViewModels
                     }
                 case "Player1Turn":
                     {
+                        gameEnded = false;
+
+                        if (!timerExists)
+                        {
+                            ThreadStart timerRef = new ThreadStart(TimerCounter);
+                            Thread timerThread = new Thread(timerRef);
+                            timerThread.Start();
+                            timerExists = true;
+                        }
+
                         battlelogTextBlock += "Its player 1 his turn\n";
                         if (MainViewModel.player.isPlayer1)
                         {
@@ -97,7 +138,10 @@ namespace GUI.ViewModels
                             battlelogTextBlock = "Player 1 won!\n";
                         }
                         MainViewModel.player.Turn = false;
+                        gameEnded = true;
                         break;
+
+                        
                     }
             }
         }
